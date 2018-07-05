@@ -1,6 +1,7 @@
 package com.qi.somecastapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -51,14 +52,24 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
         notifyDataSetChanged();
     }
 
-    class Holder extends RecyclerView.ViewHolder {
+    class Holder extends RecyclerView.ViewHolder implements View.OnClickListener{
         final AppCompatImageView mPosterImageView;
         TextView showNameTv;
+        private Context mContext;
 
         Holder(View itemView) {
             super(itemView);
             mPosterImageView = itemView.findViewById(R.id.iv_poster);
             showNameTv = itemView.findViewById(R.id.tv_show_name);
+            mContext = itemView.getContext();
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(mContext, PodcastDetailActivity.class);
+            intent.putExtra(Intent.EXTRA_TEXT, podcastList.get(getAdapterPosition()).getRawData());
+            mContext.startActivity(intent);
         }
     }
 }

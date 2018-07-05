@@ -7,11 +7,15 @@ import org.json.JSONObject; /**
 public class Podcast {
     private String podcastName;
     private String imagePath;
+    private String id;
+    private String rawData;
 
     public Podcast(JSONObject jsonObject) {
         try {
+            rawData = jsonObject.toString();
             podcastName = jsonObject.getString("title");
             imagePath = jsonObject.getString("image");
+            id = jsonObject.getString("id");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -23,5 +27,13 @@ public class Podcast {
 
     public String getImagePath() {
         return imagePath;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getRawData() {
+        return rawData;
     }
 }

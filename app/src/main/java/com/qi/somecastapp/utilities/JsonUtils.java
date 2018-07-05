@@ -1,6 +1,7 @@
 package com.qi.somecastapp.utilities;
 
 import com.qi.somecastapp.model.Genre;
+import com.qi.somecastapp.model.Podcast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,6 +65,21 @@ public class JsonUtils {
             for (int i = 0; i < json.length(); i++) {
                 //ignore parent_id
                 genres.add(new Genre(json.getJSONObject(i).getString("name"), json.getJSONObject(i).getInt("id"), 0));
+            }
+            return genres;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ArrayList<Podcast> parsePodcastInGenre(String response) {
+        try {
+            JSONArray json = new JSONObject(response).getJSONArray("channels");
+            ArrayList<Podcast> genres = new ArrayList<>();
+            for (int i = 0; i < json.length(); i++) {
+                //ignore parent_id
+                genres.add(new Podcast(json.getJSONObject(i)));
             }
             return genres;
         } catch (JSONException e) {

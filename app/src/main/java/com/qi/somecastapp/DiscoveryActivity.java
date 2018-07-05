@@ -19,14 +19,14 @@ import com.android.volley.toolbox.Volley;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
 
-public class MainActivity extends AppCompatActivity
+public class DiscoveryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView podcastsRv;
     private RecyclerView genreRv;
     private PodcastListAdapter padcastAdapter;
     private GenreListAdapter genreAdapter;
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = DiscoveryActivity.class.getSimpleName();
     private RequestQueue requestQueue;
 
     @Override

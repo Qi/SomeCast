@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/iv_poster"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter" />
+
     <TextView
+        android:id="@+id/tv_show_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_show_name"/>
-</LinearLayout>
+        android:layout_alignEnd="@id/iv_poster"
+        android:layout_alignStart="@id/iv_poster"
+        android:layout_below="@id/iv_poster"
+        android:maxLines="1"/>
+</RelativeLayout>

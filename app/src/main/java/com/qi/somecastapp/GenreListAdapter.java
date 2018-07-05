@@ -48,14 +48,16 @@ class GenreListAdapter extends RecyclerView.Adapter<GenreListAdapter.GenreHolder
         if(genreList != null) {
             holder.genreName.setText(genreList.get(position).getName());
 
-            Response.Listener<String> responseListener = new Response.Listener<String>(){
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, response);
-                    holder.adapter.setData(JsonUtils.parsePodcastInGenre(response));
-                }
-            };
-            mRequestQueue.add(NetworkUtils.getPodcastList(genreList.get(position).getId(), responseListener));
+            if (holder.adapter.getItemCount() == 0) {
+                Response.Listener<String> responseListener = new Response.Listener<String>(){
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, response);
+                        holder.adapter.setData(JsonUtils.parsePodcastInGenre(response));
+                    }
+                };
+                mRequestQueue.add(NetworkUtils.getPodcastList(genreList.get(position).getId(), responseListener));
+            }
         }
     }
 

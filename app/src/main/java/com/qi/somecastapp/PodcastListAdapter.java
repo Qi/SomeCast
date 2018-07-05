@@ -54,6 +54,7 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
     class Holder extends RecyclerView.ViewHolder {
         final AppCompatImageView mPosterImageView;
         TextView showNameTv;
+
         Holder(View itemView) {
             super(itemView);
             mPosterImageView = itemView.findViewById(R.id.iv_poster);

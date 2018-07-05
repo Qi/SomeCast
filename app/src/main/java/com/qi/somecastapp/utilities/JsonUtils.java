@@ -62,7 +62,8 @@ public class JsonUtils {
         try {
             JSONArray json = new JSONObject(response).getJSONArray("genres");
             ArrayList<Genre> genres = new ArrayList<>();
-            for (int i = 0; i < json.length(); i++) {
+//            for (int i = 0; i < json.length(); i++) { //too much quires
+            for (int i = 0; i < 3; i++) {
                 //ignore parent_id
                 genres.add(new Genre(json.getJSONObject(i).getString("name"), json.getJSONObject(i).getInt("id"), 0));
             }

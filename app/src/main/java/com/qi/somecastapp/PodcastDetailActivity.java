@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -55,7 +56,11 @@ public class PodcastDetailActivity extends AppCompatActivity {
                 setTitle(currentPodcast.getPodcastName());
                 Picasso.with(this).load(currentPodcast.getImagePath()).into(posterIv);
                 requestQueue = Volley.newRequestQueue(this);
-
+                LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+                layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                layoutManager.setAutoMeasureEnabled(true);
+                episodeRv = findViewById(R.id.rv_episode);
+                episodeRv.setLayoutManager(layoutManager);
                 episodeListAdapter = new EpisodeListAdapter();
                 episodeRv.setAdapter(episodeListAdapter);
 

@@ -21,9 +21,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name=".database.SubscribedContentProvider"
+            android:authorities="com.qi.somecast.subscribed"
+            android:exported="false" />
+
         <activity
             android:name=".PodcastDetailActivity"
             android:label="@string/title_activity_podcast_detail"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SubscriptionActivity"
+            android:label="@string/title_activity_subscription"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

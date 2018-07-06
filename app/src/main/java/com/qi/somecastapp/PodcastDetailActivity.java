@@ -1,6 +1,8 @@
 package com.qi.somecastapp;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,10 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.qi.somecastapp.database.SubscribedContract;
 import com.qi.somecastapp.model.Podcast;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
@@ -31,6 +35,7 @@ public class PodcastDetailActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private EpisodeListAdapter episodeListAdapter;
     private RecyclerView episodeRv;
+    private boolean subscribed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +48,7 @@ public class PodcastDetailActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                addFavorite();
             }
         });
 
@@ -75,6 +79,30 @@ public class PodcastDetailActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void addFavorite() {
+        if (currentPodcast != null) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(SubscribedContract.SubscribedEntry.COLUMN_PODCAST_ID, currentPodcast.getId());
+            contentValues.put(SubscribedContract.SubscribedEntry.COLUMN_PODCAST_META, currentPodcast.getRawData());
+            if (!subscribed) {
+                Uri uri = getContentResolver().insert(SubscribedContract.SubscribedEntry.CONTENT_URI, contentValues);
+                if(uri != null) {
+                    Toast.makeText(getBaseContext(), currentPodcast.getPodcastName() + " subscribed.", Toast.LENGTH_SHORT).show();
+                }
+
+                subscribed = true;
+            } else {
+                Uri uri = SubscribedContract.SubscribedEntry.CONTENT_URI.buildUpon().appendPath(currentPodcast.getId()).build();
+                int deleted = getContentResolver().delete(uri, null, null);
+                if (deleted > 0) {
+                    Toast.makeText(getBaseContext(), currentPodcast.getPodcastName() + " unsubscribed.", Toast.LENGTH_SHORT).show();
+                }
+                subscribed = false;
+            }
+//            updateFavImage();
         }
     }
 }

@@ -22,10 +22,12 @@ public final class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
-    public static final String BASE_GENRE_URL =
+    private static final String BASE_GENRE_URL =
             "https://listennotes.p.mashape.com/api/v1/genres";
-    public static final String BASE_PODCAST_URL =
+    private static final String BASE_PODCAST_URL =
             "https://listennotes.p.mashape.com/api/v1/best_podcasts?";
+    private static final String Base_PODCAST_META_URL =
+            "https://listennotes.p.mashape.com/api/v1/podcasts/";
 
     private final static String KEY_PARAM = "X-Mashape-Key";
     private final static String LANG_PARAM = "language";
@@ -71,5 +73,12 @@ public final class NetworkUtils {
             }
         };
         return stringRequest;
+    }
+//"https://listennotes.p.mashape.com/api/v1/podcasts/9d6939745ed34e3aab0eb78a408ab40d/"
+    public static StringRequest getPodcastMeta(String id, Response.Listener<String> responseListener) {
+        //TODO: get more episodes
+        String uri = Uri.parse(Base_PODCAST_META_URL + id + "/").buildUpon()
+                .build().toString();
+        return getStringRequest(uri, responseListener);
     }
 }

@@ -75,15 +75,6 @@ public class SubscriptionActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
     }
 
 
@@ -178,7 +169,7 @@ public class SubscriptionActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_subscription, container, false);
-            subscriptionRv = getActivity().findViewById(R.id.rv_subscription);
+            subscriptionRv = rootView.findViewById(R.id.rv_subscription);
             subscriptionRv.setHasFixedSize(true);
             Bundle args = getArguments();
             LinearLayoutManager layoutManager;

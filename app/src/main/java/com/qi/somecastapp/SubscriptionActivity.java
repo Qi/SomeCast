@@ -1,9 +1,5 @@
 package com.qi.somecastapp;
 
-import android.database.Cursor;
-import android.os.AsyncTask;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.content.Context;
 import android.support.v7.widget.ThemedSpinnerAdapter;
@@ -28,14 +23,8 @@ import android.content.res.Resources.Theme;
 
 import android.widget.TextView;
 
-import com.qi.somecastapp.database.SubscribedContract;
-import com.qi.somecastapp.model.Podcast;
 import com.qi.somecastapp.utilities.FetchSubscriptionTask;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class SubscriptionActivity extends AppCompatActivity {
     private static final int EPISODE_SCREEN = 0;

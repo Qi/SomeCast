@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +18,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.qi.somecastapp.database.SubscribedContract;
+import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.model.Podcast;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
@@ -27,7 +27,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PodcastDetailActivity extends AppCompatActivity {
+public class PodcastDetailActivity extends AppCompatActivity implements PlaybackListener{
 
     private static final String TAG = PodcastDetailActivity.class.getSimpleName();
     private Podcast currentPodcast;
@@ -65,7 +65,7 @@ public class PodcastDetailActivity extends AppCompatActivity {
                 layoutManager.setAutoMeasureEnabled(true);
                 episodeRv = findViewById(R.id.rv_episode);
                 episodeRv.setLayoutManager(layoutManager);
-                episodeListAdapter = new EpisodeListAdapter();
+                episodeListAdapter = new EpisodeListAdapter(this);
                 episodeRv.setAdapter(episodeListAdapter);
 
                 Response.Listener<String> responseListener = new Response.Listener<String>(){
@@ -104,5 +104,10 @@ public class PodcastDetailActivity extends AppCompatActivity {
             }
 //            updateFavImage();
         }
+    }
+
+    @Override
+    public void onEpisodeClick(Episode episode) {
+
     }
 }

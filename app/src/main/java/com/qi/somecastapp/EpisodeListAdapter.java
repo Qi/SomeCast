@@ -17,6 +17,11 @@ import java.util.ArrayList;
 class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>{
     private ArrayList<Episode> episodeList;
     private Context mContext;
+    private PlaybackListener mPlaybackListener;
+
+    public EpisodeListAdapter(PlaybackListener mPlaybackListener) {
+        this.mPlaybackListener = mPlaybackListener;
+    }
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -45,11 +50,17 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
         notifyDataSetChanged();
     }
 
-    public class Holder extends RecyclerView.ViewHolder {
+    public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         public Holder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tv_episode_title);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mPlaybackListener.onEpisodeClick(episodeList.get(getAdapterPosition()));
         }
     }
 }

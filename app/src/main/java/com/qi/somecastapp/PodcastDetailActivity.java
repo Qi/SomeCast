@@ -136,6 +136,12 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
         mMediaBrowserHelper.registerCallback(new MediaBrowserListener());
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mMediaBrowserHelper.onStart();
+    }
+
     private void addFavorite() {
         if (currentPodcast != null) {
             ContentValues contentValues = new ContentValues();
@@ -162,7 +168,7 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
 
     @Override
     public void onEpisodeClick(Episode episode) {
-
+        mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
     }
 
     void buildTransportControls() {

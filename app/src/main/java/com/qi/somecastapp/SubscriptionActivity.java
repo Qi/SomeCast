@@ -23,6 +23,7 @@ import android.content.res.Resources.Theme;
 
 import android.widget.TextView;
 
+import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.utilities.FetchSubscriptionTask;
 
 
@@ -131,7 +132,7 @@ public class SubscriptionActivity extends AppCompatActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends Fragment implements PlaybackListener {
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -169,11 +170,16 @@ public class SubscriptionActivity extends AppCompatActivity {
                 new FetchSubscriptionTask(adapter, getContext()).execute(args.getInt(ARG_SCREEN_TYPE));
             } else {
                 layoutManager = new LinearLayoutManager(getContext());
-                adapter = new EpisodeListAdapter();
+                adapter = new EpisodeListAdapter(this);
             }
             subscriptionRv.setLayoutManager(layoutManager);
             subscriptionRv.setAdapter(adapter);
             return rootView;
+        }
+
+        @Override
+        public void onEpisodeClick(Episode episode) {
+
         }
     }
 }

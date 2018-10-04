@@ -2,6 +2,7 @@ package com.qi.somecastapp.service;
 
 import android.app.Notification;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -63,12 +64,13 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-        return null;
+        return new BrowserRoot("root", null);
     }
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-
+        List<MediaBrowserCompat.MediaItem> ret = new ArrayList<>();
+        result.sendResult(ret);
     }
 
     public class MySessionCallback extends MediaSessionCompat.Callback {
@@ -124,6 +126,11 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         @Override
         public void onPause() {
             mPlayback.pause();
+        }
+
+        @Override
+        public void onPlayFromUri(Uri uri, Bundle extras) {
+            mPlayback.playFromUrl(uri.toString());
         }
 
         @Override

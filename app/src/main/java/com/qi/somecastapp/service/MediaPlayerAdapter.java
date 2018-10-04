@@ -2,12 +2,15 @@ package com.qi.somecastapp.service;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.qi.somecastapp.PodcastDetailActivity;
+
+import java.io.IOException;
 
 /**
  * Created by Qi Wu on 9/26/2018.
@@ -64,6 +67,24 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         mCurrentMedia = metadata;
         final String mediaId = metadata.getDescription().getMediaId();
 //        playFile(MusicLibrary.getMusicFilename(mediaId));
+    }
+
+    @Override
+    public void playFromUrl(String url) {
+        initializeMediaPlayer();
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            mMediaPlayer.prepare(); // might take long! (for buffering, etc)
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mMediaPlayer.start();
     }
 
     @Override

@@ -3,6 +3,7 @@
     package="com.qi.somecastapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -35,11 +36,18 @@
             android:name=".SubscriptionActivity"
             android:label="@string/title_activity_subscription"
             android:theme="@style/AppTheme.NoActionBar" />
-        <service android:name=".service.MediaPlaybackService">
+        <service android:name=".service.MediaPlaybackService"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

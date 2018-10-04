@@ -45,6 +45,7 @@ public abstract class PlayerAdapter {
     }
 
     public abstract void playFromMedia(MediaMetadataCompat metadata);
+    public abstract void playFromUrl(String url);
 
     public abstract MediaMetadataCompat getCurrentMedia();
 

@@ -89,6 +89,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         private final List<MediaSessionCompat.QueueItem> mPlaylist = new ArrayList<>();
         private int mQueueIndex = -1;
         private MediaMetadataCompat mPreparedMedia;
+        private Uri targetUri;
 
         @Override
         public void onAddQueueItem(MediaDescriptionCompat description) {
@@ -127,12 +128,13 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                 return;
             }
 
-            if (mPreparedMedia == null) {
-                onPrepare();
-            }
-
-            mPlayback.playFromMedia(mPreparedMedia);
-            Log.d(TAG, "onPlayFromMediaId: MediaSession active");
+//            if (mPreparedMedia == null) {
+//                onPrepare();
+//            }
+//
+//            mPlayback.playFromMedia(mPreparedMedia);
+//            Log.d(TAG, "onPlayFromMediaId: MediaSession active");
+            if (targetUri != null) mPlayback.playFromUrl(targetUri.toString());
         }
 
         @Override
@@ -142,7 +144,8 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
         @Override
         public void onPlayFromUri(Uri uri, Bundle extras) {
-            mPlayback.playFromUrl(uri.toString());
+            targetUri = uri;
+            if (targetUri != null) mPlayback.playFromUrl(targetUri.toString());
         }
 
         @Override

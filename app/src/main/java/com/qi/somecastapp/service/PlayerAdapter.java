@@ -107,6 +107,10 @@ public abstract class PlayerAdapter {
         }
     }
 
+    public abstract void replayTenSeconds();
+
+    public abstract void forwardThirtySeconds();
+
     /**
      * Helper class for managing audio focus related tasks.
      */

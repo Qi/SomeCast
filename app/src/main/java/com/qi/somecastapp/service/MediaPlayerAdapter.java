@@ -84,7 +84,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mMediaPlayer.start();
+        play();
     }
 
     @Override
@@ -252,6 +252,24 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     public void setVolume(float volume) {
         if (mMediaPlayer != null) {
             mMediaPlayer.setVolume(volume, volume);
+        }
+    }
+
+    @Override
+    public void replayTenSeconds() {
+        if (mMediaPlayer.getCurrentPosition() > 10000) {
+            mMediaPlayer.seekTo(mMediaPlayer.getCurrentPosition()-10000);
+        } else {
+            mMediaPlayer.seekTo(0);
+        }
+    }
+
+    @Override
+    public void forwardThirtySeconds() {
+        if (mMediaPlayer.getCurrentPosition() < mMediaPlayer.getDuration() - 30000) {
+            mMediaPlayer.seekTo(mMediaPlayer.getCurrentPosition() + 30000);
+        } else {
+            mMediaPlayer.seekTo(mMediaPlayer.getDuration());
         }
     }
 }

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -20,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -51,6 +53,14 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
     private MediaBrowserCompat mMediaBrowser;
     private MediaBrowserHelper mMediaBrowserHelper;
     private boolean mIsPlaying;
+    private ImageButton playPauseBt;
+    private ImageButton skipBt;
+    private ImageButton nextBt;
+    private ImageButton replayBt;
+    private ImageButton previousBt;
+    private CustomSeekBar mSeekBarAudio;
+    private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
+    private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
 
 
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallbacks =
@@ -73,9 +83,8 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
                     // Save the controller
                     MediaControllerCompat.setMediaController(PodcastDetailActivity.this, mediaController);
 
-                    // Finish building the UI
-                    buildTransportControls();
-                }
+                    // Register a Callback to stay in sync
+                    mediaController.registerCallback(controllerCallback);                }
 
                 @Override
                 public void onConnectionSuspended() {
@@ -102,6 +111,12 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
                 addFavorite();
             }
         });
+
+        playPauseBt = findViewById(R.id.play_pause_bt);
+        skipBt = findViewById(R.id.skip_30_bt);
+        nextBt = findViewById(R.id.next_bt);
+        replayBt = findViewById(R.id.replay_10_bt);
+        previousBt = findViewById(R.id.previous_bt);
 
         Intent sourceIntent = getIntent();
         if (sourceIntent != null && sourceIntent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -140,6 +155,13 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
     public void onStart() {
         super.onStart();
         mMediaBrowserHelper.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+//        mSeekBarAudio.disconnectController();
+        mMediaBrowserHelper.onStop();
     }
 
     private void addFavorite() {
@@ -209,8 +231,33 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
 
                 @Override
                 public void onPlaybackStateChanged(PlaybackStateCompat state) {
+                    int a = 1;
                 }
             };
+
+    public void requestPreviousTrack(View view) {
+        mMediaBrowserHelper.getTransportControls().skipToPrevious();
+    }
+
+    public void replayTen(View view) {
+        mMediaBrowserHelper.getTransportControls().sendCustomAction(CUSTOM_ACTION_REPLAY_TEN, null);
+    }
+
+    public void playPause(View view) {
+        if (mIsPlaying) {
+            mMediaBrowserHelper.getTransportControls().pause();
+        } else {
+            mMediaBrowserHelper.getTransportControls().play();
+        }
+    }
+
+    public void skipThirty(View view) {
+        mMediaBrowserHelper.getTransportControls().sendCustomAction(CUSTOM_ACTION_FORWARD_THIRTY, null);
+    }
+
+    public void requestNextTrack(View view) {
+        mMediaBrowserHelper.getTransportControls().skipToNext();
+    }
 
     private class MediaBrowserConnection extends MediaBrowserHelper {
         public MediaBrowserConnection(Context context) {
@@ -244,6 +291,9 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
         public void onPlaybackStateChanged(PlaybackStateCompat playbackState) {
             mIsPlaying = playbackState != null &&
                     playbackState.getState() == PlaybackStateCompat.STATE_PLAYING;
+            if (playPauseBt != null)
+                playPauseBt.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),
+                        mIsPlaying?R.drawable.ic_baseline_pause_24px:R.drawable.ic_baseline_play_arrow_24px));
 //            mMediaControlsImage.setPressed(mIsPlaying);
         }
 

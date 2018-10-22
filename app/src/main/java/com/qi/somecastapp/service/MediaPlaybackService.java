@@ -15,6 +15,8 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
+import com.qi.somecastapp.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,9 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private static final String MY_MEDIA_ROOT_ID = "media_root_id";
     private static final String MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id";
     private static final String LOG_TAG = "MediaPlaybackService";
-    private static final String TAG = MediaPlaybackService.class.getSimpleName();;
+    private static final String TAG = MediaPlaybackService.class.getSimpleName();
+    private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
+    private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
 
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
@@ -49,6 +53,14 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                 .setActions(
                         PlaybackStateCompat.ACTION_PLAY |
                                 PlaybackStateCompat.ACTION_PLAY_PAUSE);
+        mStateBuilder.addCustomAction(new PlaybackStateCompat.CustomAction.Builder(
+                CUSTOM_ACTION_REPLAY_TEN, "Replay 10", R.drawable.ic_baseline_replay_10_24px)
+                .setExtras(null)
+                .build());
+        mStateBuilder.addCustomAction(new PlaybackStateCompat.CustomAction.Builder(
+                CUSTOM_ACTION_FORWARD_THIRTY, "Forward 30", R.drawable.ic_baseline_forward_30_24px)
+                .setExtras(null)
+                .build());
         mMediaSession.setPlaybackState(mStateBuilder.build());
 
         // MySessionCallback() has methods that handle callbacks from a media controller
@@ -156,6 +168,19 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         @Override
         public void onSeekTo(long pos) {
             mPlayback.seekTo(pos);
+        }
+
+        @Override
+        public void onCustomAction(String action, Bundle extras) {
+            switch (action) {
+                case CUSTOM_ACTION_REPLAY_TEN:
+                    mPlayback.replayTenSeconds();
+                    break;
+                case CUSTOM_ACTION_FORWARD_THIRTY:
+                    mPlayback.forwardThirtySeconds();
+                default:
+                    break;
+            }
         }
 
         private boolean isReadyToPlay() {

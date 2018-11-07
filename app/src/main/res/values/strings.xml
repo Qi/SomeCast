@@ -98,4 +98,8 @@
     </string>
     <string name="title_activity_subscription">SubscriptionActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="label_play">Play</string>
+    <string name="label_pause">Pause</string>
+    <string name="label_next">Forward 30</string>
+    <string name="label_previous">Back 10</string>
 </resources>

@@ -35,6 +35,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private PlaybackStateCompat.Builder mStateBuilder;
     private PlayerAdapter mPlayback;
     private boolean mServiceInStartedState;
+    private MediaNotificationManager mMediaNotificationManager;
 
     @Override
     public void onCreate() {
@@ -68,9 +69,23 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
         // Set the session's token so that client activities can communicate with it.
         setSessionToken(mMediaSession.getSessionToken());
-
+        mMediaNotificationManager = new MediaNotificationManager(this);
         mPlayback = new MediaPlayerAdapter(this, new MediaPlayerListener());
 
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        stopSelf();
+    }
+
+    @Override
+    public void onDestroy() {
+        mMediaNotificationManager.onDestroy();
+        mPlayback.stop();
+        mMediaSession.release();
+        Log.d(TAG, "onDestroy: MediaPlayerAdapter stopped, and MediaSession released");
     }
 
     @Nullable
@@ -123,10 +138,10 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
         @Override
         public void onPlay() {
-            if (!isReadyToPlay()) {
-                // Nothing to play.
-                return;
-            }
+//            if (!isReadyToPlay()) {
+//                // Nothing to play.
+//                return;
+//            }
 
 //            if (mPreparedMedia == null) {
 //                onPrepare();
@@ -221,9 +236,9 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         class ServiceManager {
 
             private void moveServiceToStartedState(PlaybackStateCompat state) {
-//                Notification notification =
-//                        mMediaNotificationManager.getNotification(
-//                                mPlayback.getCurrentMedia(), state, getSessionToken());
+                Notification notification =
+                        mMediaNotificationManager.getNotification(
+                                mPlayback.getCurrentMedia(), state, getSessionToken());
 
                 if (!mServiceInStartedState) {
                     ContextCompat.startForegroundService(
@@ -232,16 +247,16 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                     mServiceInStartedState = true;
                 }
 
-//                startForeground(MediaNotificationManager.NOTIFICATION_ID, notification);
+                startForeground(MediaNotificationManager.NOTIFICATION_ID, notification);
             }
 
             private void updateNotificationForPause(PlaybackStateCompat state) {
                 stopForeground(false);
-//                Notification notification =
-//                        mMediaNotificationManager.getNotification(
-//                                mPlayback.getCurrentMedia(), state, getSessionToken());
-//                mMediaNotificationManager.getNotificationManager()
-//                        .notify(MediaNotificationManager.NOTIFICATION_ID, notification);
+                Notification notification =
+                        mMediaNotificationManager.getNotification(
+                                mPlayback.getCurrentMedia(), state, getSessionToken());
+                mMediaNotificationManager.getNotificationManager()
+                        .notify(MediaNotificationManager.NOTIFICATION_ID, notification);
             }
 
             private void moveServiceOutOfStartedState(PlaybackStateCompat state) {

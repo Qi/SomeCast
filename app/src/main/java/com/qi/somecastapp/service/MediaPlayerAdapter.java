@@ -11,6 +11,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import com.qi.somecastapp.PodcastDetailActivity;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Qi Wu on 9/26/2018.
@@ -20,6 +21,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     private final Context mContext;
     private MediaPlayer mMediaPlayer;
     private String mFilename;
+    private String mUrl;
     private PlaybackInfoListener mPlaybackInfoListener;
     private MediaMetadataCompat mCurrentMedia;
     private int mState;
@@ -71,6 +73,20 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
     @Override
     public void playFromUrl(String url) {
+        boolean mediaChanged = (mUrl == null || !mUrl.equals(url));
+        if (mCurrentMediaPlayedToCompletion) {
+            mediaChanged = true;
+            mCurrentMediaPlayedToCompletion = false;
+        }
+        if (!mediaChanged) {
+            if (!isPlaying()) {
+                play();
+            }
+            return;
+        } else {
+            release();
+        }
+        mUrl = url;
         initializeMediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
@@ -89,7 +105,14 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
     @Override
     public MediaMetadataCompat getCurrentMedia() {
-        return mCurrentMedia;
+        return new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "1")
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "album")
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "artist")
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 10000)
+                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "genre")
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "title")
+                .build();
     }
 
     private void playFile(String filename) {

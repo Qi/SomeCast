@@ -39,6 +39,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PodcastDetailActivity extends AppCompatActivity implements PlaybackListener {
@@ -59,6 +60,8 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
     private ImageButton replayBt;
     private ImageButton previousBt;
     private CustomSeekBar mSeekBarAudio;
+    private ArrayList<Episode> episodes;
+    private int nowPlayingIndex = 0;
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
     private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
 
@@ -138,7 +141,8 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, response);
-                        episodeListAdapter.setData(JsonUtils.parseEpisodes(response));
+                        episodes = JsonUtils.parseEpisodes(response);
+                        episodeListAdapter.setData(episodes);
                     }
                 };
                 requestQueue.add(NetworkUtils.getPodcastMeta(currentPodcast.getId(), responseListener));
@@ -190,6 +194,7 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
 
     @Override
     public void onEpisodeClick(Episode episode) {
+        nowPlayingIndex = episodes.indexOf(episode);
         mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
     }
 
@@ -236,7 +241,9 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
             };
 
     public void requestPreviousTrack(View view) {
-        mMediaBrowserHelper.getTransportControls().skipToPrevious();
+        int targetIndex = nowPlayingIndex == 0 ? nowPlayingIndex - 1 : nowPlayingIndex;
+        mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episodes.get(targetIndex).getAudioPath()), null);
+
     }
 
     public void replayTen(View view) {
@@ -256,7 +263,11 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
     }
 
     public void requestNextTrack(View view) {
-        mMediaBrowserHelper.getTransportControls().skipToNext();
+        if (nowPlayingIndex == episodes.size() - 1) {
+            mMediaBrowserHelper.getTransportControls().stop();
+        } else {
+            mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episodes.get(nowPlayingIndex + 1).getAudioPath()), null);
+        }
     }
 
     private class MediaBrowserConnection extends MediaBrowserHelper {

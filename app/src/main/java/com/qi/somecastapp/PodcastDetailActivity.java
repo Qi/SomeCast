@@ -241,9 +241,9 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
             };
 
     public void requestPreviousTrack(View view) {
-        int targetIndex = nowPlayingIndex == 0 ? nowPlayingIndex - 1 : nowPlayingIndex;
+        int targetIndex = nowPlayingIndex == 0 ? nowPlayingIndex : nowPlayingIndex - 1 ;
         mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episodes.get(targetIndex).getAudioPath()), null);
-
+        nowPlayingIndex = targetIndex;
     }
 
     public void replayTen(View view) {
@@ -267,6 +267,7 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
             mMediaBrowserHelper.getTransportControls().stop();
         } else {
             mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episodes.get(nowPlayingIndex + 1).getAudioPath()), null);
+            nowPlayingIndex = nowPlayingIndex + 1;
         }
     }
 

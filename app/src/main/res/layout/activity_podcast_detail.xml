@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".PodcastDetailActivity">
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -77,35 +76,40 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
             <ImageButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:src="@drawable/ic_baseline_skip_previous_24px"
                 android:id="@+id/previous_bt"
                 android:onClick="requestPreviousTrack"/>
             <ImageButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:src="@drawable/ic_baseline_replay_10_24px"
                 android:id="@+id/replay_10_bt"
                 android:onClick="replayTen"/>
             <ImageButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:src="@drawable/ic_baseline_play_arrow_24px"
                 android:id="@+id/play_pause_bt"
                 android:onClick="playPause"/>
             <ImageButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:src="@drawable/ic_baseline_forward_30_24px"
                 android:id="@+id/skip_30_bt"
                 android:onClick="skipThirty"/>
             <ImageButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:src="@drawable/ic_baseline_skip_next_24px"

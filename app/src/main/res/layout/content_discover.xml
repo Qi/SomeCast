@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".DiscoveryActivity"
-    tools:showIn="@layout/app_bar_discovery">
+    tools:context=".DiscoverActivity"
+    tools:showIn="@layout/app_bar_discover">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_genre_list"

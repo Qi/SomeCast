@@ -20,20 +20,20 @@ import com.android.volley.toolbox.Volley;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
 
-public class DiscoveryActivity extends AppCompatActivity
+public class DiscoverActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView podcastsRv;
     private RecyclerView genreRv;
     private PodcastListAdapter padcastAdapter;
     private GenreListAdapter genreAdapter;
-    private static final String TAG = DiscoveryActivity.class.getSimpleName();
+    private static final String TAG = DiscoverActivity.class.getSimpleName();
     private RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_discovery);
+        setContentView(R.layout.activity_discover);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

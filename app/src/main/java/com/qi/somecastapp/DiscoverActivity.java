@@ -20,8 +20,7 @@ import com.android.volley.toolbox.Volley;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
 
-public class DiscoverActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class DiscoverActivity extends AppCompatActivity{
 
     private RecyclerView podcastsRv;
     private RecyclerView genreRv;
@@ -42,9 +41,6 @@ public class DiscoverActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         genreRv = findViewById(R.id.rv_genre_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -96,31 +92,5 @@ public class DiscoverActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            Intent intent = new Intent(this, SubscriptionActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 }

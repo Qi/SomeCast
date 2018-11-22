@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import static com.qi.somecastapp.SubscriptionActivity.PODCAST_SCREEN;
+import static com.qi.somecastapp.SubscriptionFragment.PODCAST_SCREEN;
 
 /**
  * Created by Qi Wu on 7/6/2018.

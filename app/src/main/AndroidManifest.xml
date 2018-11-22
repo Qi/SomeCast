@@ -32,10 +32,6 @@
             android:name=".PodcastDetailActivity"
             android:label="@string/title_activity_podcast_detail"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".SubscriptionActivity"
-            android:label="@string/title_activity_subscription"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".service.MediaPlaybackService"

@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
                 //TODO: change icons
                 case R.id.navigation_home:
                     toolbar.setTitle(R.string.title_home);
-                    fragment = new HomeFragment();
+                    fragment = new SubscriptionFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_discover:
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
     }
 
 }

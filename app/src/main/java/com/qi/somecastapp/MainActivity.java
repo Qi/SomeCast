@@ -5,11 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_discover:
                     toolbar.setTitle(R.string.title_discover);
-                    fragment = new DiscoverFragment2();
+                    fragment = new DiscoverFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_downloads:

@@ -52,7 +52,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PodcastDetailActivity extends AppCompatActivity implements PlaybackListener{
+public class PodcastDetailActivity extends AppCompatActivity implements EpisodeClickListener {
 
     private static final String TAG = PodcastDetailActivity.class.getSimpleName();
     private Podcast currentPodcast;

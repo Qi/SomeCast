@@ -7,6 +7,6 @@ import com.qi.somecastapp.model.Episode;
 /**
  * Created by Qi Wu on 9/24/2018.
  */
-interface PlaybackListener {
+interface EpisodeClickListener {
     void onEpisodeClicked(Episode episode, View v);
 }

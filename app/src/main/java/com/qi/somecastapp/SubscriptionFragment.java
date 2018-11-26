@@ -17,7 +17,7 @@ import com.qi.somecastapp.utilities.FetchSubscriptionTask;
  * A fragment representing a list of Items.
  * <p/>
  */
-public class SubscriptionFragment extends Fragment implements PlaybackListener{
+public class SubscriptionFragment extends Fragment{
 
     public static final int EPISODE_SCREEN = 0;
     public static final int PODCAST_SCREEN = 1;
@@ -80,10 +80,5 @@ public class SubscriptionFragment extends Fragment implements PlaybackListener{
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-    @Override
-    public void onEpisodeClicked(Episode episode, View v) {
-
     }
 }

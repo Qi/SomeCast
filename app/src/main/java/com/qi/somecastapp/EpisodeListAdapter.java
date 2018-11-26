@@ -1,9 +1,6 @@
 package com.qi.somecastapp;
 
-import android.app.DownloadManager;
 import android.content.Context;
-import android.net.Uri;
-import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +18,10 @@ import java.util.ArrayList;
 class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>{
     private ArrayList<Episode> episodeList;
     private Context mContext;
-    private PlaybackListener mPlaybackListener;
+    private EpisodeClickListener mEpisodeClickListener;
 
-    public EpisodeListAdapter(PlaybackListener mPlaybackListener) {
-        this.mPlaybackListener = mPlaybackListener;
+    public EpisodeListAdapter(EpisodeClickListener mEpisodeClickListener) {
+        this.mEpisodeClickListener = mEpisodeClickListener;
     }
 
     @Override
@@ -66,7 +63,7 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
 
         @Override
         public void onClick(View v) {
-            mPlaybackListener.onEpisodeClicked(episodeList.get(getAdapterPosition()), v);
+            mEpisodeClickListener.onEpisodeClicked(episodeList.get(getAdapterPosition()), v);
         }
     }
 }

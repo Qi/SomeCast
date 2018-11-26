@@ -10,12 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qi.somecastapp.dummy.DummyContent;
-import com.qi.somecastapp.dummy.DummyContent.DummyItem;
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.utilities.FetchSubscriptionTask;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -87,7 +83,7 @@ public class SubscriptionFragment extends Fragment implements PlaybackListener{
     }
 
     @Override
-    public void onEpisodeClick(Episode episode) {
+    public void onEpisodeClicked(Episode episode, View v) {
 
     }
 }

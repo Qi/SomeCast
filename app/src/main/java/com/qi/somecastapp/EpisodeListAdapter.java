@@ -1,10 +1,14 @@
 package com.qi.somecastapp;
 
+import android.app.DownloadManager;
 import android.content.Context;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.qi.somecastapp.model.Episode;
@@ -28,7 +32,6 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
         mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View parentView = inflater.inflate(R.layout.episode_view_holder, parent, false);
-
         return new Holder(parentView);
     }
 
@@ -52,15 +55,18 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
+        Button downloadBt;
         public Holder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tv_episode_title);
-            itemView.setOnClickListener(this);
+            downloadBt = itemView.findViewById(R.id.bt_download);
+            title.setOnClickListener(this);
+            downloadBt.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            mPlaybackListener.onEpisodeClick(episodeList.get(getAdapterPosition()));
+            mPlaybackListener.onEpisodeClicked(episodeList.get(getAdapterPosition()), v);
         }
     }
 }

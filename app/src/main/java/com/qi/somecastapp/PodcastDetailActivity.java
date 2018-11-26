@@ -1,14 +1,24 @@
 package com.qi.somecastapp;
 
+import android.Manifest;
+import android.app.DownloadManager;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -42,7 +52,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PodcastDetailActivity extends AppCompatActivity implements PlaybackListener {
+public class PodcastDetailActivity extends AppCompatActivity implements PlaybackListener{
 
     private static final String TAG = PodcastDetailActivity.class.getSimpleName();
     private Podcast currentPodcast;
@@ -62,8 +72,11 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
     private CustomSeekBar mSeekBarAudio;
     private ArrayList<Episode> episodes;
     private int nowPlayingIndex = 0;
+    private DownloadManager downloadManager;
+    ArrayList<Long> list = new ArrayList<>();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
     private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
+    private static final String CHANNEL_ID = "com.qi.somecastapp.download.channel";
 
 
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallbacks =
@@ -99,6 +112,12 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
                     // The Service has refused our connection
                 }
             };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +172,9 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
         mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MediaPlaybackService.class), mConnectionCallbacks, null);
         mMediaBrowserHelper = new MediaBrowserConnection(this);
         mMediaBrowserHelper.registerCallback(new MediaBrowserListener());
+        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        registerReceiver(onComplete,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     @Override
@@ -193,31 +215,63 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
     }
 
     @Override
-    public void onEpisodeClick(Episode episode) {
-        nowPlayingIndex = episodes.indexOf(episode);
-        mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
+    public void onEpisodeClicked(Episode episode, View v) {
+        switch (v.getId()) {
+            case R.id.tv_episode_title:
+                nowPlayingIndex = episodes.indexOf(episode);
+                mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
+                break;
+            case R.id.bt_download:
+                int targetIndex = episodes.indexOf(episode);
+                if (haveStoragePermission(targetIndex)) {
+                    startsDownload(targetIndex);
+                }
+                break;
+        }
+    }
+
+    private boolean haveStoragePermission(int targetIndex) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.e(TAG,"Have permission");
+                return true;
+            } else {
+                Log.e(TAG,"Asking for permission");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, targetIndex);
+                return false;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            startsDownload(requestCode);
+        }
+    }
+
+    private void startsDownload(int targetIndex){
+        Uri audioPath =Uri.parse(episodes.get(targetIndex).getAudioPath());
+        DownloadManager.Request request = new DownloadManager.Request(audioPath);
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+        request.setAllowedOverRoaming(false);
+        request.setTitle(episodes.get(targetIndex).getTitle() + ".mp3");
+        request.setDescription(episodes.get(targetIndex).getDescription());
+        request.setVisibleInDownloadsUi(true);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/SomeCastApp/");
+        long refId = downloadManager.enqueue(request);
+        list.add(refId);
     }
 
     void buildTransportControls() {
 //        // Grab the view for the play/pause button
-//        mPlayPause = (ImageView) findViewById(R.id.play_pause);
-//
-//        // Attach a listener to the button
-//        mPlayPause.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // Since this is a play/pause button, you'll need to test the current state
-//                // and choose the action accordingly
-//
-//                int pbState = MediaControllerCompat.getMediaController(PodcastDetailActivity.this).getPlaybackState().getState();
-//                if (pbState == PlaybackStateCompat.STATE_PLAYING) {
-//                    MediaControllerCompat.getMediaController(PodcastDetailActivity.this).getTransportControls().pause();
-//                } else {
-//                    MediaControllerCompat.getMediaController(PodcastDetailActivity.this).getTransportControls().play();
-//                }
-//            }
-//        });
-
+//        mPlayPause = (ImageView) findViewById(R.id.play_pause)
+        //TODO: Fix buildTransportControls()
         MediaControllerCompat mediaController = MediaControllerCompat.getMediaController(PodcastDetailActivity.this);
 
         // Display the initial state
@@ -333,4 +387,29 @@ public class PodcastDetailActivity extends AppCompatActivity implements Playback
             super.onQueueChanged(queue);
         }
     }
+
+    BroadcastReceiver onComplete = new BroadcastReceiver() {
+
+        public void onReceive(Context ctxt, Intent intent) {
+
+            // get the refid from the download manager
+            long referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+
+            list.remove(referenceId);
+
+            if (list.isEmpty())
+            {
+                Log.e("INSIDE", "" + referenceId);
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(PodcastDetailActivity.this, CHANNEL_ID)
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setContentTitle("GadgetSaint")
+                                .setContentText("All Download completed");
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(455, mBuilder.build());
+            }
+
+        }
+    };
 }

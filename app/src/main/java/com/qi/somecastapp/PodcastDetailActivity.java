@@ -263,7 +263,7 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
         request.setTitle(episodes.get(targetIndex).getTitle() + ".mp3");
         request.setDescription(episodes.get(targetIndex).getDescription());
         request.setVisibleInDownloadsUi(true);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/SomeCastApp/");
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PODCASTS, "/SomeCastApp/" + episodes.get(targetIndex).getTitle() + ".mp3");
         long refId = downloadManager.enqueue(request);
         list.add(refId);
     }

@@ -342,11 +342,6 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
 
             final MediaControllerCompat mediaController = getMediaController();
 
-            // Queue up all media items for this simple sample.
-            for (final MediaBrowserCompat.MediaItem mediaItem : children) {
-                mediaController.addQueueItem(mediaItem.getDescription());
-            }
-
             // Call prepare now so pressing play just works.
             mediaController.getTransportControls().prepare();
         }

@@ -24,8 +24,10 @@ import java.util.List;
  * Created by Qi Wu on 9/24/2018.
  */
 public class MediaPlaybackService extends MediaBrowserServiceCompat {
-    private static final String MY_MEDIA_ROOT_ID = "media_root_id";
+    public static final String ROOT_ID = "media_root_id";
     private static final String MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id";
+    private static final String ALBUMS_ID = "podcast_album";
+    private static final String FOLDERS_ID = "podcast_folder";
     private static final String LOG_TAG = "MediaPlaybackService";
     private static final String TAG = MediaPlaybackService.class.getSimpleName();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
@@ -36,11 +38,16 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private PlayerAdapter mPlayback;
     private boolean mServiceInStartedState;
     private MediaNotificationManager mMediaNotificationManager;
+    private String mLastCategory;
+    List<MediaBrowserCompat.MediaItem> mRootItems = new ArrayList<>();
+    private DataModel mDataModel;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        mDataModel = new DataModel(this);
+        addRootItems();
         // Create a MediaSessionCompat
         mMediaSession = new MediaSessionCompat(this, LOG_TAG);
 
@@ -91,13 +98,42 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-        return new BrowserRoot("root", null);
+        return new BrowserRoot(ROOT_ID, null);
     }
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-        List<MediaBrowserCompat.MediaItem> ret = new ArrayList<>();
-        result.sendResult(ret);
+        switch (parentId) {
+            case ROOT_ID:
+                result.sendResult(mRootItems);
+                mLastCategory = parentId;
+                break;
+            case ALBUMS_ID:
+                mDataModel.onQueryByAlbum(parentId, result);
+                mLastCategory = parentId;
+                break;
+            case FOLDERS_ID:
+                mDataModel.onQueryByFolder(parentId, result);
+                mLastCategory = parentId;
+                break;
+            default:
+                mDataModel.onQueryByKey(mLastCategory, parentId, result);
+        }
+    }
+
+    private void addRootItems() {
+        MediaDescriptionCompat albums = new MediaDescriptionCompat.Builder()
+                .setMediaId(ALBUMS_ID)
+                .setTitle("Albums")
+//                .setIconUri(Utils.getUriForResource(this, R.drawable.ic_album))
+                .build();
+        mRootItems.add(new MediaBrowserCompat.MediaItem(albums, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
+        MediaDescriptionCompat folders = new MediaDescriptionCompat.Builder()
+                .setMediaId(FOLDERS_ID)
+                .setTitle("Folders")
+//                .setIconUri(Utils.getUriForResource(this, R.drawable.ic_folder))
+                .build();
+        mRootItems.add(new MediaBrowserCompat.MediaItem(folders, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
     }
 
     public class MySessionCallback extends MediaSessionCompat.Callback {

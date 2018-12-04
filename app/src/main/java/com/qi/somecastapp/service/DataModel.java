@@ -5,21 +5,20 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
-import android.media.MediaDescription;
 import android.media.MediaMetadata;
-import android.media.browse.MediaBrowser.MediaItem;
-import android.media.session.MediaSession.QueueItem;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
-import android.service.media.MediaBrowserService.Result;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaBrowserServiceCompat;
+import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 public class DataModel {
-    private static final String TAG = "LMBDataModel";
+    private static final String TAG = "SomeCastDataModel";
 
     private static final Uri[] ALL_AUDIO_URI = new Uri[] {
             MediaStore.Audio.Media.INTERNAL_CONTENT_URI,
@@ -38,11 +37,6 @@ public class DataModel {
     private static final Uri[] ALBUMS_URI = new Uri[] {
             MediaStore.Audio.Albums.INTERNAL_CONTENT_URI,
             MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
-    };
-
-    private static final Uri[] ARTISTS_URI = new Uri[] {
-            MediaStore.Audio.Artists.INTERNAL_CONTENT_URI,
-            MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
     };
 
     private static final Uri[] GENRES_URI = new Uri[] {
@@ -67,55 +61,32 @@ public class DataModel {
     private ContentResolver mResolver;
     private AsyncTask mPendingTask;
 
-    private List<QueueItem> mQueue = new ArrayList<>();
+    private List<MediaSessionCompat.QueueItem> mQueue = new ArrayList<>();
 
     public DataModel(Context context) {
         mContext = context;
         mResolver = context.getContentResolver();
     }
 
-    public void onQueryByFolder(String parentId, Result<List<MediaItem>> result) {
+    public void onQueryByFolder(String parentId, MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result) {
         FilesystemListTask query = new FilesystemListTask(result, ALL_AUDIO_URI, mResolver);
         queryInBackground(result, query);
     }
 
-    public void onQueryByAlbum(String parentId, Result<List<MediaItem>> result) {
+    public void onQueryByAlbum(String parentId, MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result) {
         QueryTask query = new QueryTask.Builder()
                 .setResolver(mResolver)
                 .setResult(result)
                 .setUri(ALBUMS_URI)
                 .setKeyColumn(AudioColumns.ALBUM_KEY)
                 .setTitleColumn(AudioColumns.ALBUM)
-                .setFlags(MediaItem.FLAG_BROWSABLE)
+                .setFlags(MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
                 .build();
         queryInBackground(result, query);
     }
 
-    public void onQueryByArtist(String parentId, Result<List<MediaItem>> result) {
-        QueryTask query = new QueryTask.Builder()
-                .setResolver(mResolver)
-                .setResult(result)
-                .setUri(ARTISTS_URI)
-                .setKeyColumn(AudioColumns.ARTIST_KEY)
-                .setTitleColumn(AudioColumns.ARTIST)
-                .setFlags(MediaItem.FLAG_BROWSABLE)
-                .build();
-        queryInBackground(result, query);
-    }
 
-    public void onQueryByGenre(String parentId, Result<List<MediaItem>> result) {
-        QueryTask query = new QueryTask.Builder()
-                .setResolver(mResolver)
-                .setResult(result)
-                .setUri(GENRES_URI)
-                .setKeyColumn(MediaStore.Audio.Genres._ID)
-                .setTitleColumn(MediaStore.Audio.Genres.NAME)
-                .setFlags(MediaItem.FLAG_BROWSABLE)
-                .build();
-        queryInBackground(result, query);
-    }
-
-    private void queryInBackground(Result<List<MediaItem>> result,
+    private void queryInBackground(MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result,
                                    AsyncTask<Void, Void, Void> task) {
         result.detach();
 
@@ -127,7 +98,7 @@ public class DataModel {
         task.execute();
     }
 
-    public List<QueueItem> getQueue() {
+    public List<MediaSessionCompat.QueueItem> getQueue() {
         return mQueue;
     }
 
@@ -183,7 +154,7 @@ public class DataModel {
      * Note: This clears out the queue. You should have a local copy of the queue before calling
      * this method.
      */
-    public void onQueryByKey(String lastCategory, String parentId, Result<List<MediaItem>> result) {
+    public void onQueryByKey(String lastCategory, String parentId, MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result) {
         mQueue.clear();
 
         QueryTask.Builder query = new QueryTask.Builder()
@@ -191,30 +162,15 @@ public class DataModel {
                 .setResult(result);
 
         Uri[] uri = null;
-        if (lastCategory.equals(LocalMediaBrowserService.GENRES_ID)) {
-            // Genres come from a different table and don't use the where clause from the
-            // usual media table so we need to have this condition.
-            try {
-                long id = Long.parseLong(parentId);
-                query.setUri(new Uri[] {
-                        MediaStore.Audio.Genres.Members.getContentUri(EXTERNAL, id),
-                        MediaStore.Audio.Genres.Members.getContentUri(INTERNAL, id) });
-            } catch (NumberFormatException e) {
-                // This should never happen.
-                Log.e(TAG, "Incorrect key type: " + parentId + ", sending empty result");
-                result.sendResult(new ArrayList<MediaItem>());
-                return;
-            }
-        } else {
             query.setUri(ALL_AUDIO_URI)
                     .setWhereClause(QUERY_BY_KEY_WHERE_CLAUSE)
                     .setWhereArgs(new String[] { parentId, parentId, parentId, parentId });
-        }
+
 
         query.setKeyColumn(AudioColumns.TITLE_KEY)
                 .setTitleColumn(AudioColumns.TITLE)
                 .setSubtitleColumn(AudioColumns.ALBUM)
-                .setFlags(MediaItem.FLAG_PLAYABLE)
+                .setFlags(MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
                 .setQueue(mQueue);
         queryInBackground(result, query.build());
     }
@@ -225,11 +181,11 @@ public class DataModel {
     // in the name of understandability.
     private static class FilesystemListTask extends AsyncTask<Void, Void, Void> {
         private static final String[] COLUMNS = { AudioColumns.DATA };
-        private Result<List<MediaItem>> mResult;
+        private MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> mResult;
         private Uri[] mUris;
         private ContentResolver mResolver;
 
-        public FilesystemListTask(Result<List<MediaItem>> result, Uri[] uris,
+        public FilesystemListTask(MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result, Uri[] uris,
                                   ContentResolver resolver) {
             mResult = result;
             mUris = uris;
@@ -271,16 +227,16 @@ public class DataModel {
 
             // Take the list of deduplicated directories and put them into the results list with
             // the full directory path as the key so we can match on it later.
-            List<MediaItem> results = new ArrayList<>();
+            List<MediaBrowserCompat.MediaItem> results = new ArrayList<>();
             for (String path : paths) {
                 int dirNameStart = path.lastIndexOf(File.separator) + 1;
                 String dirName = path.substring(dirNameStart, path.length());
-                MediaDescription description = new MediaDescription.Builder()
+                MediaDescriptionCompat description = new MediaDescriptionCompat.Builder()
                         .setMediaId(path + "%")  // Used in a like query.
                         .setTitle(dirName)
                         .setSubtitle(path)
                         .build();
-                results.add(new MediaItem(description, MediaItem.FLAG_BROWSABLE));
+                results.add(new MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
             }
             mResult.sendResult(results);
             return null;
@@ -288,7 +244,7 @@ public class DataModel {
     }
 
     private static class QueryTask extends AsyncTask<Void, Void, Void> {
-        private Result<List<MediaItem>> mResult;
+        private MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> mResult;
         private String[] mColumns;
         private String mWhereClause;
         private String[] mWhereArgs;
@@ -298,7 +254,7 @@ public class DataModel {
         private Uri[] mUris;
         private int mFlags;
         private ContentResolver mResolver;
-        private List<QueueItem> mQueue;
+        private List<MediaSessionCompat.QueueItem> mQueue;
 
         private QueryTask(Builder builder) {
             mColumns = builder.mColumns;
@@ -316,7 +272,7 @@ public class DataModel {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            List<MediaItem> results = new ArrayList<>();
+            List<MediaBrowserCompat.MediaItem> results = new ArrayList<>();
 
             long idx = 0;
 
@@ -339,7 +295,7 @@ public class DataModel {
                                 path.putString(PATH_KEY, cursor.getString(pathColumn));
                             }
 
-                            MediaDescription.Builder builder = new MediaDescription.Builder()
+                            MediaDescriptionCompat.Builder builder = new MediaDescriptionCompat.Builder()
                                     .setMediaId(cursor.getString(keyColumn))
                                     .setTitle(cursor.getString(titleColumn))
                                     .setExtras(path);
@@ -348,13 +304,13 @@ public class DataModel {
                                 builder.setSubtitle(cursor.getString(subtitleColumn));
                             }
 
-                            MediaDescription description = builder.build();
-                            results.add(new MediaItem(description, mFlags));
+                            MediaDescriptionCompat description = builder.build();
+                            results.add(new MediaBrowserCompat.MediaItem(description, mFlags));
 
                             // We rebuild the queue here so if the user selects the item then we
                             // can immediately use this queue.
                             if (mQueue != null) {
-                                mQueue.add(new QueueItem(description, idx));
+                                mQueue.add(new MediaSessionCompat.QueueItem(description, idx));
                             }
                             idx++;
                         }
@@ -381,7 +337,7 @@ public class DataModel {
         // Boilerplate Alert!
         //
         public static class Builder {
-            private Result<List<MediaItem>> mResult;
+            private MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> mResult;
             private String[] mColumns;
             private String mWhereClause;
             private String[] mWhereArgs;
@@ -391,7 +347,7 @@ public class DataModel {
             private Uri[] mUris;
             private int mFlags;
             private ContentResolver mResolver;
-            private List<QueueItem> mQueue;
+            private List<MediaSessionCompat.QueueItem> mQueue;
 
             public Builder setColumns(String[] columns) {
                 mColumns = columns;
@@ -433,7 +389,7 @@ public class DataModel {
                 return this;
             }
 
-            public Builder setResult(Result<List<MediaItem>> result) {
+            public Builder setResult(MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>> result) {
                 mResult = result;
                 return this;
             }
@@ -443,7 +399,7 @@ public class DataModel {
                 return this;
             }
 
-            public Builder setQueue(List<QueueItem> queue) {
+            public Builder setQueue(List<MediaSessionCompat.QueueItem> queue) {
                 mQueue = queue;
                 return this;
             }

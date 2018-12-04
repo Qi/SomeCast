@@ -22,6 +22,8 @@ import com.qi.somecastapp.service.MediaPlaybackService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.qi.somecastapp.service.MediaPlaybackService.ROOT_ID;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -60,7 +62,11 @@ public class DownloadsFragment extends ListFragment {
 
         // Get our arguments
         final Bundle args = getArguments();
-        mId = args.getParcelable(ARG_ID);
+        if (args != null) {
+            mId = args.getString(ARG_ID);
+        } else {
+            mId = ROOT_ID;
+        }
 
         // A hint about who we are, so the service can customize the results if it wants to.
         final Bundle rootHints = new Bundle();
@@ -91,11 +97,11 @@ public class DownloadsFragment extends ListFragment {
         final DownloadsFragment fragment = new DownloadsFragment();
 
         final Bundle args = new Bundle();
-        args.putString(DownloadsFragment.ARG_ID, item.media.getMediaId());
+        args.putString(ARG_ID, item.media.getMediaId());
         fragment.setArguments(args);
 
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, fragment)
+                .replace(R.id.frame_container, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit();

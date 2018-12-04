@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -342,11 +343,6 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
 
             final MediaControllerCompat mediaController = getMediaController();
 
-            // Queue up all media items for this simple sample.
-            for (final MediaBrowserCompat.MediaItem mediaItem : children) {
-                mediaController.addQueueItem(mediaItem.getDescription());
-            }
-
             // Call prepare now so pressing play just works.
             mediaController.getTransportControls().prepare();
         }
@@ -397,8 +393,7 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
 
             list.remove(referenceId);
 
-            if (list.isEmpty())
-            {
+            if (list.isEmpty()) {
                 Log.e("INSIDE", "" + referenceId);
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(PodcastDetailActivity.this, CHANNEL_ID)
@@ -409,6 +404,20 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(455, mBuilder.build());
             }
+
+            MediaScannerConnection.scanFile(
+                    getApplicationContext(),
+                    new String[]{ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getAbsolutePath() },
+                    new String[]{ "audio/mp3", "*/*" },
+                    new MediaScannerConnection.MediaScannerConnectionClient()
+                    {
+                        public void onMediaScannerConnected()
+                        {
+                        }
+                        public void onScanCompleted(String path, Uri uri)
+                        {
+                        }
+                    });
 
         }
     };

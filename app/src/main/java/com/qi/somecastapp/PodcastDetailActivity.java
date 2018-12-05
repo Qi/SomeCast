@@ -47,10 +47,22 @@ import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PodcastDetailActivity extends AppCompatActivity implements EpisodeClickListener {
@@ -74,7 +86,7 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
     private ArrayList<Episode> episodes;
     private int nowPlayingIndex = 0;
     private DownloadManager downloadManager;
-    ArrayList<Long> list = new ArrayList<>();
+    HashMap<Long, MetaCorrectorRunnable> list = new HashMap<>();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
     private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
     private static final String CHANNEL_ID = "com.qi.somecastapp.download.channel";
@@ -261,14 +273,54 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
         DownloadManager.Request request = new DownloadManager.Request(audioPath);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
         request.setAllowedOverRoaming(false);
-        request.setTitle(episodes.get(targetIndex).getTitle() + ".mp3");
+        request.setTitle(episodes.get(targetIndex).getTitle());
         request.setDescription(episodes.get(targetIndex).getDescription());
         request.setVisibleInDownloadsUi(true);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PODCASTS, "/SomeCastApp/" + episodes.get(targetIndex).getTitle() + ".mp3");
+        String fileName = episodes.get(targetIndex).getId() + ".mp3";
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PODCASTS, fileName);
+        request.allowScanningByMediaScanner();
         long refId = downloadManager.enqueue(request);
-        list.add(refId);
+        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getAbsolutePath() + "/" + fileName;
+        MetaCorrectorRunnable corrector = new MetaCorrectorRunnable(filePath, episodes.get(targetIndex), currentPodcast.getPodcastName());
+        list.put(refId, corrector);
     }
 
+    class MetaCorrectorRunnable implements Runnable {
+        private String mFilePath;
+        private Episode mEpisode;
+        private String mAlbum;
+
+        public MetaCorrectorRunnable(String filePath, Episode episode, String podcastName) {
+            this.mFilePath = filePath;
+            this.mEpisode = episode;
+            this.mAlbum = podcastName;
+        }
+
+        @Override
+        public void run() {
+            File src = new File(mFilePath);
+            try {
+                AudioFile file = AudioFileIO.read(src);
+                Tag tag = file.getTag();
+                tag.setField(FieldKey.TITLE,mEpisode.getTitle());
+                tag.setField(FieldKey.ALBUM, mAlbum);
+                file.commit();
+            } catch (CannotReadException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (TagException e) {
+                e.printStackTrace();
+            } catch (ReadOnlyFileException e) {
+                e.printStackTrace();
+            } catch (InvalidAudioFrameException e) {
+                e.printStackTrace();
+            } catch (CannotWriteException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
     void buildTransportControls() {
 //        // Grab the view for the play/pause button
 //        mPlayPause = (ImageView) findViewById(R.id.play_pause)
@@ -390,21 +442,11 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
 
             // get the refid from the download manager
             long referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-
-            list.remove(referenceId);
-
-            if (list.isEmpty()) {
-                Log.e("INSIDE", "" + referenceId);
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(PodcastDetailActivity.this, CHANNEL_ID)
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .setContentTitle("GadgetSaint")
-                                .setContentText("All Download completed");
-
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(455, mBuilder.build());
+            if (referenceId != -1) {
+                Log.d(TAG, "Setting metadata for task: " + referenceId);
+                (new Thread(list.get(referenceId))).run();
+                list.remove(referenceId);
             }
-
             MediaScannerConnection.scanFile(
                     getApplicationContext(),
                     new String[]{ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getAbsolutePath() },

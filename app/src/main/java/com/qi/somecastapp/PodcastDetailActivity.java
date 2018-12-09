@@ -42,6 +42,7 @@ import com.android.volley.toolbox.Volley;
 import com.qi.somecastapp.database.SubscribedContract;
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.model.Podcast;
+import com.qi.somecastapp.service.DownloadService;
 import com.qi.somecastapp.service.MediaPlaybackService;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
@@ -65,6 +66,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
+
 public class PodcastDetailActivity extends AppCompatActivity implements EpisodeClickListener {
 
     private static final String TAG = PodcastDetailActivity.class.getSimpleName();
@@ -85,8 +88,6 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
     private CustomSeekBar mSeekBarAudio;
     private ArrayList<Episode> episodes;
     private int nowPlayingIndex = 0;
-    private DownloadManager downloadManager;
-    HashMap<Long, MetaCorrectorRunnable> list = new HashMap<>();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
     private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
     private static final String CHANNEL_ID = "com.qi.somecastapp.download.channel";
@@ -129,7 +130,6 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(onComplete);
     }
 
     @Override
@@ -185,9 +185,6 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
         mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MediaPlaybackService.class), mConnectionCallbacks, null);
         mMediaBrowserHelper = new MediaBrowserConnection(this);
         mMediaBrowserHelper.registerCallback(new MediaBrowserListener());
-        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        registerReceiver(onComplete,
-                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     @Override
@@ -247,10 +244,10 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG,"Have permission");
+                Log.d(TAG,"Have permission");
                 return true;
             } else {
-                Log.e(TAG,"Asking for permission");
+                Log.d(TAG,"Asking for permission");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, targetIndex);
                 return false;
             }
@@ -269,58 +266,11 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
     }
 
     private void startsDownload(int targetIndex){
-        Uri audioPath =Uri.parse(episodes.get(targetIndex).getAudioPath());
-        DownloadManager.Request request = new DownloadManager.Request(audioPath);
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-        request.setAllowedOverRoaming(false);
-        request.setTitle(episodes.get(targetIndex).getTitle());
-        request.setDescription(episodes.get(targetIndex).getDescription());
-        request.setVisibleInDownloadsUi(true);
-        String fileName = episodes.get(targetIndex).getId() + ".mp3";
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PODCASTS, fileName);
-        request.allowScanningByMediaScanner();
-        long refId = downloadManager.enqueue(request);
-        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getAbsolutePath() + "/" + fileName;
-        MetaCorrectorRunnable corrector = new MetaCorrectorRunnable(filePath, episodes.get(targetIndex), currentPodcast.getPodcastName());
-        list.put(refId, corrector);
+        Intent intent = new Intent(this, DownloadService.class);
+        intent.putExtra(KEY_EPISODE_META, episodes.get(targetIndex).editPodcastName(currentPodcast.getPodcastName()));
+        startService(intent);
     }
 
-    class MetaCorrectorRunnable implements Runnable {
-        private String mFilePath;
-        private Episode mEpisode;
-        private String mAlbum;
-
-        public MetaCorrectorRunnable(String filePath, Episode episode, String podcastName) {
-            this.mFilePath = filePath;
-            this.mEpisode = episode;
-            this.mAlbum = podcastName;
-        }
-
-        @Override
-        public void run() {
-            File src = new File(mFilePath);
-            try {
-                AudioFile file = AudioFileIO.read(src);
-                Tag tag = file.getTag();
-                tag.setField(FieldKey.TITLE,mEpisode.getTitle());
-                tag.setField(FieldKey.ALBUM, mAlbum);
-                file.commit();
-            } catch (CannotReadException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (TagException e) {
-                e.printStackTrace();
-            } catch (ReadOnlyFileException e) {
-                e.printStackTrace();
-            } catch (InvalidAudioFrameException e) {
-                e.printStackTrace();
-            } catch (CannotWriteException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
     void buildTransportControls() {
 //        // Grab the view for the play/pause button
 //        mPlayPause = (ImageView) findViewById(R.id.play_pause)
@@ -436,31 +386,4 @@ public class PodcastDetailActivity extends AppCompatActivity implements EpisodeC
         }
     }
 
-    BroadcastReceiver onComplete = new BroadcastReceiver() {
-
-        public void onReceive(Context ctxt, Intent intent) {
-
-            // get the refid from the download manager
-            long referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-            if (referenceId != -1) {
-                Log.d(TAG, "Setting metadata for task: " + referenceId);
-                (new Thread(list.get(referenceId))).run();
-                list.remove(referenceId);
-            }
-            MediaScannerConnection.scanFile(
-                    getApplicationContext(),
-                    new String[]{ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getAbsolutePath() },
-                    new String[]{ "audio/mp3", "*/*" },
-                    new MediaScannerConnection.MediaScannerConnectionClient()
-                    {
-                        public void onMediaScannerConnected()
-                        {
-                        }
-                        public void onScanCompleted(String path, Uri uri)
-                        {
-                        }
-                    });
-
-        }
-    };
 }

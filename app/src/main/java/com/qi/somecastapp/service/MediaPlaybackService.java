@@ -103,7 +103,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-        switch (parentId) {
+//        switch (parentId) {
 //            case ROOT_ID:
 //                result.sendResult(mRootItems);
 //                mLastCategory = parentId;
@@ -116,9 +116,10 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 //                mDataModel.onQueryByFolder(parentId, result);
 //                mLastCategory = parentId;
 //                break;
-            default:
-                mDataModel.onQueryByKey(mLastCategory, "%Podcasts%", result);
-        }
+//            default:
+//                mDataModel.onQueryByKey(mLastCategory, "%Podcasts%", result);
+//        }
+        mDataModel.onQueryByKey(mLastCategory, "%Podcasts%", result);
     }
 
     private void addRootItems() {

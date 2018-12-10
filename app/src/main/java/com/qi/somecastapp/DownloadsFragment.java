@@ -22,6 +22,7 @@ import com.qi.somecastapp.service.MediaPlaybackService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE;
 import static com.qi.somecastapp.service.MediaPlaybackService.ROOT_ID;
 
 /**
@@ -90,21 +91,24 @@ public class DownloadsFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         final Item item = mItems.get(position);
-
         Log.i("DownloadsFragment", "Item clicked: " + position + " -- "
                 + mAdapter.getItem(position).media.getMediaId());
 
-        final DownloadsFragment fragment = new DownloadsFragment();
+        if (item.media.getFlags() != FLAG_PLAYABLE) {
+            final DownloadsFragment fragment = new DownloadsFragment();
 
-        final Bundle args = new Bundle();
-        args.putString(ARG_ID, item.media.getMediaId());
-        fragment.setArguments(args);
+            final Bundle args = new Bundle();
+            args.putString(ARG_ID, item.media.getMediaId());
+            fragment.setArguments(args);
 
-        getFragmentManager().beginTransaction()
-                .replace(R.id.frame_container, fragment)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit();
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.frame_container, fragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+
+        }
 
     }
 

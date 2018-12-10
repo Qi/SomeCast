@@ -88,7 +88,7 @@ public class DownloadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "New download task added. Task list size: " + list.size());
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
@@ -111,7 +111,7 @@ public class DownloadService extends Service {
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "All download tasks done. Stopping service...");
         unregisterReceiver(onComplete);
     }
 

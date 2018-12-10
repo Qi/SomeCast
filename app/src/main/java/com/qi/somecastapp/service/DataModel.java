@@ -164,10 +164,9 @@ public class DataModel {
                 .setResolver(mResolver)
                 .setResult(result);
 
-        Uri[] uri = null;
-            query.setUri(ALL_AUDIO_URI)
-                    .setWhereClause(QUERY_BY_KEY_WHERE_CLAUSE)
-                    .setWhereArgs(new String[] { parentId, parentId, parentId, parentId });
+        query.setUri(ALL_AUDIO_URI)
+                .setWhereClause(QUERY_BY_KEY_WHERE_CLAUSE)
+                .setWhereArgs(new String[] { parentId, parentId, parentId, parentId });
 
 
         query.setKeyColumn(AudioColumns.TITLE_KEY)

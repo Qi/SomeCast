@@ -104,20 +104,20 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
         switch (parentId) {
-            case ROOT_ID:
-                result.sendResult(mRootItems);
-                mLastCategory = parentId;
-                break;
-            case ALBUMS_ID:
-                mDataModel.onQueryByAlbum(parentId, result);
-                mLastCategory = parentId;
-                break;
-            case FOLDERS_ID:
-                mDataModel.onQueryByFolder(parentId, result);
-                mLastCategory = parentId;
-                break;
+//            case ROOT_ID:
+//                result.sendResult(mRootItems);
+//                mLastCategory = parentId;
+//                break;
+//            case ALBUMS_ID:
+//                mDataModel.onQueryByAlbum(parentId, result);
+//                mLastCategory = parentId;
+//                break;
+//            case FOLDERS_ID:
+//                mDataModel.onQueryByFolder(parentId, result);
+//                mLastCategory = parentId;
+//                break;
             default:
-                mDataModel.onQueryByKey(mLastCategory, parentId, result);
+                mDataModel.onQueryByKey(mLastCategory, "%Podcasts%", result);
         }
     }
 

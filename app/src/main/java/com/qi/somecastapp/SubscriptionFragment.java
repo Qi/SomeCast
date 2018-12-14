@@ -27,6 +27,7 @@ public class SubscriptionFragment extends Fragment{
     // TODO: Customize parameters
     private int mColumnCount = 3;
     RecyclerView subscriptionRv;
+    private PodcastClickListener mListener;
 
 
     /**
@@ -64,7 +65,7 @@ public class SubscriptionFragment extends Fragment{
         LinearLayoutManager layoutManager;
         RecyclerView.Adapter adapter;
         layoutManager = new GridLayoutManager(getContext(), 3);
-        adapter = new PodcastListAdapter();
+        adapter = new PodcastListAdapter(mListener);
         new FetchSubscriptionTask(adapter, getContext()).execute(PODCAST_SCREEN);
         subscriptionRv.setLayoutManager(layoutManager);
         subscriptionRv.setAdapter(adapter);
@@ -75,10 +76,17 @@ public class SubscriptionFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        if (context instanceof PodcastClickListener) {
+            mListener = (PodcastClickListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement PodcastClickListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener = null;
     }
 }

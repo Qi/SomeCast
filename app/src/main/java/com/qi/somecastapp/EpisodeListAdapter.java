@@ -18,10 +18,10 @@ import java.util.ArrayList;
 class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>{
     private ArrayList<Episode> episodeList;
     private Context mContext;
-    private EpisodeClickListener mEpisodeClickListener;
+    private PodcastClickListener mClickListener;
 
-    public EpisodeListAdapter(EpisodeClickListener mEpisodeClickListener) {
-        this.mEpisodeClickListener = mEpisodeClickListener;
+    public EpisodeListAdapter(PodcastClickListener clickListener) {
+        this.mClickListener = clickListener;
     }
 
     @Override
@@ -63,7 +63,7 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
 
         @Override
         public void onClick(View v) {
-            mEpisodeClickListener.onEpisodeClicked(episodeList.get(getAdapterPosition()), v);
+            mClickListener.onEpisodeClicked(episodeList.get(getAdapterPosition()), v);
         }
     }
 }

@@ -19,8 +19,12 @@ import java.util.ArrayList;
  */
 public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.Holder>{
     private Context mContext;
-
+    private PodcastClickListener clickListener;
     private ArrayList<Podcast> podcastList;
+
+    public PodcastListAdapter(PodcastClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -67,9 +71,7 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(mContext, PodcastDetailActivity.class);
-            intent.putExtra(Intent.EXTRA_TEXT, podcastList.get(getAdapterPosition()).getRawData());
-            mContext.startActivity(intent);
+            clickListener.onPodcastClicked(podcastList.get(getAdapterPosition()).getRawData());
         }
     }
 }

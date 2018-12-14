@@ -24,10 +24,12 @@ class GenreListAdapter extends RecyclerView.Adapter<GenreListAdapter.GenreHolder
     private Context mContext;
     private ArrayList<Genre> genreList;
     private RequestQueue mRequestQueue;
+    private PodcastClickListener mClickListener;
     private final String TAG = this.getClass().getSimpleName();
 
-    public GenreListAdapter(RequestQueue requestQueue) {
+    public GenreListAdapter(RequestQueue requestQueue, PodcastClickListener clickListener) {
         mRequestQueue = requestQueue;
+        mClickListener = clickListener;
     }
 
     @Override
@@ -79,7 +81,7 @@ class GenreListAdapter extends RecyclerView.Adapter<GenreListAdapter.GenreHolder
             LinearLayoutManager layoutManager = new LinearLayoutManager(itemView.getContext());
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
             podcastRv.setLayoutManager(layoutManager);
-            adapter = new PodcastListAdapter();
+            adapter = new PodcastListAdapter(mClickListener);
             podcastRv.setAdapter(adapter);
         }
     }

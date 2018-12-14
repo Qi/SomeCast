@@ -17,6 +17,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.MediaPlaybackService;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class DownloadsFragment extends ListFragment {
     private List<Item> mItems = new ArrayList();
     private String mId;
     private MediaBrowserCompat mBrowser;
+    private PodcastClickListener mListener;
 
     private static class Item {
         final MediaBrowserCompat.MediaItem media;
@@ -107,7 +109,8 @@ public class DownloadsFragment extends ListFragment {
                     .addToBackStack(null)
                     .commit();
         } else {
-
+            //TODO: LOCAL PLAYBACK
+            mListener.onEpisodeClicked(null, v);
         }
 
     }
@@ -193,5 +196,22 @@ public class DownloadsFragment extends ListFragment {
         public int getViewTypeCount() {
             return 1;
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof PodcastClickListener) {
+            mListener = (PodcastClickListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement PodcastClickListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 }

@@ -29,6 +29,7 @@ public class DiscoverFragment extends Fragment {
     private int mColumnCount = 1;
     private RequestQueue requestQueue;
     private GenreListAdapter genreAdapter;
+    private PodcastClickListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -79,7 +80,7 @@ public class DiscoverFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            genreAdapter = new GenreListAdapter(requestQueue);
+            genreAdapter = new GenreListAdapter(requestQueue, mListener);
             recyclerView.setAdapter(genreAdapter);
         }
         return view;
@@ -89,10 +90,17 @@ public class DiscoverFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        if (context instanceof PodcastClickListener) {
+            mListener = (PodcastClickListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement PodcastClickListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener = null;
     }
 }

@@ -14,6 +14,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import com.qi.somecastapp.service.MediaPlaybackService;
+import com.qi.somecastapp.utilities.PlaybackMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,8 @@ class MediaBrowserHelper {
     private final MediaBrowserSubscriptionCallback mMediaBrowserSubscriptionCallback;
 
     private MediaBrowserCompat mMediaBrowser;
+
+    private PlaybackMode currentMode;
 
     @Nullable
     private MediaControllerCompat mMediaController;

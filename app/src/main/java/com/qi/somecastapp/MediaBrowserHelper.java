@@ -161,6 +161,10 @@ class MediaBrowserHelper {
         }
     }
 
+    public void subscribeNewRoot(String mediaId) {
+        mMediaBrowser.subscribe(mMediaBrowser.getRoot(), mMediaBrowserSubscriptionCallback);
+    }
+
     /**
      * Helper for more easily performing operations on all listening clients.
      */
@@ -194,7 +198,19 @@ class MediaBrowserHelper {
 
             mMediaBrowser.subscribe(mMediaBrowser.getRoot(), mMediaBrowserSubscriptionCallback);
         }
+
+        @Override
+        public void onConnectionSuspended() {
+            Log.d(TAG, "mConnectionCallbacks.onConnectionSuspended");
+        }
+
+        @Override
+        public void onConnectionFailed() {
+            Log.d(TAG, "mConnectionCallbacks.onConnectionFailed");
+        }
     }
+
+
 
     // Receives callbacks from the MediaBrowser when the MediaBrowserService has loaded new media
     // that is ready for playback.

@@ -7,5 +7,6 @@ import com.qi.somecastapp.model.Episode;
 interface PodcastClickListener {
     void onPodcastClicked(String podcastJsonData);
     void onEpisodeClicked(Episode episode, View v);
+    void onEpisodeClicked(DownloadsFragment.Item episode, View v);
 }
 

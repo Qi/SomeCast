@@ -1,14 +1,12 @@
 package com.qi.somecastapp;
 
 import android.Manifest;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -33,6 +31,7 @@ import com.qi.somecastapp.service.MediaPlaybackService;
 
 import java.util.List;
 
+import static android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
 
 public class MainActivity extends AppCompatActivity implements PodcastClickListener {
@@ -43,38 +42,39 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private static final String CHANNEL_ID = "com.qi.somecastapp.download.channel";
     private Toolbar toolbar;
     private BottomNavigationView navigation;
-    private MediaBrowserCompat mMediaBrowser;
+//    private MediaBrowserCompat mMediaBrowser;
     private MediaBrowserHelper mMediaBrowserHelper;
     private boolean mIsPlaying;
     private ImageButton playPauseBt;
     private int nowPlayingIndex = 0;
+    private Fragment mCurrentFragment;
+    private List<MediaBrowserCompat.MediaItem> cachedChildren;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment fragment;
             switch (item.getItemId()) {
                 //TODO: change icons
                 case R.id.navigation_home:
                     toolbar.setTitle(R.string.title_home);
-                    fragment = new SubscriptionFragment();
-                    loadFragment(fragment);
+                    mCurrentFragment = new SubscriptionFragment();
+                    loadFragment(mCurrentFragment);
                     return true;
                 case R.id.navigation_discover:
                     toolbar.setTitle(R.string.title_discover);
                     if (haveStoragePermission(-1)) {
-                        fragment = new DiscoverFragment();
-                        loadFragment(fragment);
+                        mCurrentFragment = new DiscoverFragment();
+                        loadFragment(mCurrentFragment);
                         return true;
                     }
                     return false;
                 case R.id.navigation_downloads:
                     toolbar.setTitle(R.string.title_downloads);
                     if (haveStoragePermission(-2)) {
-                        fragment = new DownloadsFragment();
-                        loadFragment(fragment);
+                        mCurrentFragment = new DownloadsFragment();
+                        loadFragment(mCurrentFragment);
                         return true;
                     }
                     return false;
@@ -83,39 +83,39 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         }
     };
 
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallbacks =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-
-                    // Get the token for the MediaSession
-                    MediaSessionCompat.Token token = mMediaBrowser.getSessionToken();
-
-                    // Create a MediaControllerCompat
-                    MediaControllerCompat mediaController = null;
-                    try {
-                        mediaController = new MediaControllerCompat(MainActivity.this, // Context
-                                token);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-
-                    // Save the controller
-                    MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
-
-                    // Register a Callback to stay in sync
-                    mediaController.registerCallback(controllerCallback);                }
-
-                @Override
-                public void onConnectionSuspended() {
-                    // The Service has crashed. Disable transport controls until it automatically reconnects
-                }
-
-                @Override
-                public void onConnectionFailed() {
-                    // The Service has refused our connection
-                }
-            };
+//    private final MediaBrowserCompat.ConnectionCallback mConnectionCallbacks =
+//            new MediaBrowserCompat.ConnectionCallback() {
+//                @Override
+//                public void onConnected() {
+//
+//                    // Get the token for the MediaSession
+//                    MediaSessionCompat.Token token = mMediaBrowser.getSessionToken();
+//
+//                    // Create a MediaControllerCompat
+//                    MediaControllerCompat mediaController = null;
+//                    try {
+//                        mediaController = new MediaControllerCompat(MainActivity.this, // Context
+//                                token);
+//                    } catch (RemoteException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    // Save the controller
+//                    MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
+//
+//                    // Register a Callback to stay in sync
+//                    mediaController.registerCallback(controllerCallback);                }
+//
+//                @Override
+//                public void onConnectionSuspended() {
+//                    // The Service has crashed. Disable transport controls until it automatically reconnects
+//                }
+//
+//                @Override
+//                public void onConnectionFailed() {
+//                    // The Service has refused our connection
+//                }
+//            };
 
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
-        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MediaPlaybackService.class), mConnectionCallbacks, null);
+//        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MediaPlaybackService.class), mConnectionCallbacks, null);
         mMediaBrowserHelper = new MainActivity.MediaBrowserConnection(this);
         mMediaBrowserHelper.registerCallback(new MainActivity.MediaBrowserListener());
     }
@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
     @Override
     public void onPodcastClicked(String podcastJsonData) {
-        Fragment fragment = PodcastDetailFragment.newInstance(podcastJsonData);
-        loadFragment(fragment);
+        mCurrentFragment = PodcastDetailFragment.newInstance(podcastJsonData);
+        loadFragment(mCurrentFragment);
     }
 
     @Override
@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
             case R.id.tv_episode_title:
                 nowPlayingIndex = episodes.indexOf(episode);
                 mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
+                mMediaBrowserHelper.playOnlineContent(Uri.parse(episode.getAudioPath()), null);
                 break;
             case R.id.bt_download:
                 int targetIndex = episodes.indexOf(episode);
@@ -189,10 +190,18 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
                     startsDownload(targetIndex);
                 }
                 break;
-            case android.R.layout.simple_list_item_1:
-                //TODO: play downloaded file
-                break;
         }
+    }
+
+    @Override
+    public void onEpisodeClicked(DownloadsFragment.Item episode, View v) {
+
+        if (episode.media.getFlags() != FLAG_PLAYABLE) {
+            mMediaBrowserHelper.subscribeNewRoot(episode.media.getMediaId());
+        } else {
+            //TODO:Play local
+        }
+
     }
 
     private void startsDownload(int targetIndex){
@@ -251,6 +260,11 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
             // Call prepare now so pressing play just works.
             mediaController.getTransportControls().prepare();
+            if (mCurrentFragment instanceof DownloadsFragment) {
+                ((DownloadsFragment)mCurrentFragment).setFragmentData(parentId, children);
+            } else {
+                cachedChildren = children;
+            }
         }
     }
 
@@ -307,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 //        // Grab the view for the play/pause button
 //        mPlayPause = (ImageView) findViewById(R.id.play_pause)
         //TODO: Fix buildTransportControls()
-        MediaControllerCompat mediaController = MediaControllerCompat.getMediaController(PodcastDetailActivity.this);
+        MediaControllerCompat mediaController = MediaControllerCompat.getMediaController(MainActivity.this);
 
         // Display the initial state
         MediaMetadataCompat metadata = mediaController.getMetadata();

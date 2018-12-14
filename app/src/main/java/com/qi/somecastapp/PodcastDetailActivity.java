@@ -52,7 +52,6 @@ import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_M
 
 public class PodcastDetailActivity extends AppCompatActivity {
 
-    private static final String TAG = PodcastDetailActivity.class.getSimpleName();
 
     private ImageButton skipBt;
     private ImageButton nextBt;

@@ -42,10 +42,9 @@ public class DownloadsFragment extends ListFragment {
     private Adapter mAdapter;
     private List<Item> mItems = new ArrayList();
     private String mId;
-    private MediaBrowserCompat mBrowser;
     private PodcastClickListener mListener;
 
-    private static class Item {
+    public static class Item {
         final MediaBrowserCompat.MediaItem media;
 
         Item(MediaBrowserCompat.MediaItem m) {
@@ -74,20 +73,6 @@ public class DownloadsFragment extends ListFragment {
         // A hint about who we are, so the service can customize the results if it wants to.
         final Bundle rootHints = new Bundle();
         rootHints.putBoolean(HINT_DISPLAY, true);
-
-        mBrowser = new MediaBrowserCompat(getActivity(), new ComponentName(getActivity(), MediaPlaybackService.class), mConnectionCallbacks, rootHints);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mBrowser.connect();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mBrowser.disconnect();
     }
 
     @Override
@@ -95,59 +80,19 @@ public class DownloadsFragment extends ListFragment {
         final Item item = mItems.get(position);
         Log.i("DownloadsFragment", "Item clicked: " + position + " -- "
                 + mAdapter.getItem(position).media.getMediaId());
-
-        if (item.media.getFlags() != FLAG_PLAYABLE) {
-            final DownloadsFragment fragment = new DownloadsFragment();
-
-            final Bundle args = new Bundle();
-            args.putString(ARG_ID, item.media.getMediaId());
-            fragment.setArguments(args);
-
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.frame_container, fragment)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .addToBackStack(null)
-                    .commit();
-        } else {
-            //TODO: LOCAL PLAYBACK
-            mListener.onEpisodeClicked(null, v);
-        }
-
+        mListener.onEpisodeClicked(item, v);
     }
 
-    final MediaBrowserCompat.ConnectionCallback mConnectionCallbacks
-            = new MediaBrowserCompat.ConnectionCallback() {
-        @Override
-        public void onConnected() {
-            Log.d(TAG, "mConnectionCallbacks.onConnected");
-            if (mId == null) {
-                mId = mBrowser.getRoot();
-            }
-            mBrowser.subscribe(mId, new MediaBrowserCompat.SubscriptionCallback() {
-                @Override
-                public void onChildrenLoaded(@NonNull String parentId, @NonNull List<MediaBrowserCompat.MediaItem> children) {
-                    Log.d(TAG, "onChildrenLoaded parentUri=" + parentId
-                            + " children= " + children);
-                    mItems.clear();
-                    final int N = children.size();
-                    for (int i=0; i<N; i++) {
-                        mItems.add(new Item(children.get(i)));
-                    }
-                    mAdapter.notifyDataSetChanged();
-                }
-            });
+    void setFragmentData(@NonNull String parentId, @NonNull List<MediaBrowserCompat.MediaItem> children) {
+        Log.d(TAG, "onChildrenLoaded parentUri=" + parentId
+                + " children= " + children);
+        mItems.clear();
+        final int N = children.size();
+        for (int i=0; i<N; i++) {
+            mItems.add(new Item(children.get(i)));
         }
-
-        @Override
-        public void onConnectionSuspended() {
-            Log.d(TAG, "mConnectionCallbacks.onConnectionSuspended");
-        }
-
-        @Override
-        public void onConnectionFailed() {
-            Log.d(TAG, "mConnectionCallbacks.onConnectionFailed");
-        }
-    };
+        mAdapter.notifyDataSetChanged();
+    }
 
     private class Adapter extends BaseAdapter {
         private final LayoutInflater mInflater;

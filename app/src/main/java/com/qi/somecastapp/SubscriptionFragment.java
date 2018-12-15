@@ -3,6 +3,7 @@ package com.qi.somecastapp;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -69,6 +70,7 @@ public class SubscriptionFragment extends Fragment{
         new FetchSubscriptionTask(adapter, getContext()).execute(PODCAST_SCREEN);
         subscriptionRv.setLayoutManager(layoutManager);
         subscriptionRv.setAdapter(adapter);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
         return rootView;
     }
 

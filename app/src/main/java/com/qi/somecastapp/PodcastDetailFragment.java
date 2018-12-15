@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,7 @@ public class PodcastDetailFragment extends Fragment {
     private EpisodeListAdapter episodeListAdapter;
     private ArrayList<Episode> episodes;
     private FloatingActionButton fab;
+    private Toolbar toolbar;
 
 
     public PodcastDetailFragment() {
@@ -106,6 +108,7 @@ public class PodcastDetailFragment extends Fragment {
                 addFavorite();
             }
         });
+        toolbar = view.findViewById(R.id.toolbar);
         if (mPodcastJsonData != null) {
             ImageView posterIv = view.findViewById(R.id.iv_detail_poster);
             try {
@@ -119,7 +122,7 @@ public class PodcastDetailFragment extends Fragment {
                 episodeRv.setLayoutManager(layoutManager);
                 episodeListAdapter = new EpisodeListAdapter(mListener);
                 episodeRv.setAdapter(episodeListAdapter);
-
+                toolbar.setTitle(currentPodcast.getPodcastName());
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

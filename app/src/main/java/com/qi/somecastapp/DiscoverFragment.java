@@ -3,6 +3,7 @@ package com.qi.somecastapp;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -64,6 +65,7 @@ public class DiscoverFragment extends Fragment {
             }
         };
         requestQueue.add(NetworkUtils.getGenreList(responseListener));
+        genreAdapter = new GenreListAdapter(requestQueue, mListener);
     }
 
     @Override
@@ -80,9 +82,9 @@ public class DiscoverFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            genreAdapter = new GenreListAdapter(requestQueue, mListener);
             recyclerView.setAdapter(genreAdapter);
         }
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
         return view;
     }
 

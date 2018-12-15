@@ -120,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private void loadFragment(Fragment fragment) {
         if (fragment instanceof DownloadsFragment && cachedChildren != null) {
             ((DownloadsFragment) fragment).setFragmentData(cachedParentId, cachedChildren);
+        } else if (fragment instanceof PodcastDetailFragment) {
+
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_container, fragment);
@@ -174,8 +176,8 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     }
 
     @Override
-    public void onPodcastClicked(String podcastJsonData) {
-        mCurrentFragment = PodcastDetailFragment.newInstance(podcastJsonData);
+    public void onPodcastClicked(String podcastJsonData, boolean subscribed) {
+        mCurrentFragment = PodcastDetailFragment.newInstance(podcastJsonData, subscribed);
         loadFragment(mCurrentFragment);
     }
 

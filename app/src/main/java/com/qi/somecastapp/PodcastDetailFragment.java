@@ -1,15 +1,10 @@
 package com.qi.somecastapp;
 
-import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,7 +21,7 @@ import com.android.volley.toolbox.Volley;
 import com.qi.somecastapp.database.SubscribedContract;
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.model.Podcast;
-import com.qi.somecastapp.service.DownloadService;
+import com.qi.somecastapp.utilities.CheckSubscriptionStatusTask;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -35,8 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
 
 
 /**
@@ -51,18 +44,23 @@ public class PodcastDetailFragment extends Fragment {
     private static final String TAG = PodcastDetailFragment.class.getSimpleName();
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_DATA = "jsonData";
+    private static final String ARG_SUBSCRIBED = "isSubscribed";
 
     // TODO: Rename and change types of parameters
     private String mPodcastJsonData;
 
     private PodcastClickListener mListener;
-    private boolean subscribed;
+
+    public void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
+        updateFavImage(subscribed);
+    }
+
+    private boolean subscribed = false;
     private Podcast currentPodcast;
-    private RequestQueue requestQueue;
-    private RecyclerView episodeRv;
     private EpisodeListAdapter episodeListAdapter;
     private ArrayList<Episode> episodes;
-    private ImageView posterIv;
+    private FloatingActionButton fab;
 
 
     public PodcastDetailFragment() {
@@ -73,13 +71,15 @@ public class PodcastDetailFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param param1 Parameter 1.
+     * @param subscribed
      * @return A new instance of fragment PodcastDetailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PodcastDetailFragment newInstance(String param1) {
+    public static PodcastDetailFragment newInstance(String param1, boolean subscribed) {
         PodcastDetailFragment fragment = new PodcastDetailFragment();
         Bundle args = new Bundle();
         args.putString(ARG_DATA, param1);
+        args.putBoolean(ARG_SUBSCRIBED, subscribed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -89,6 +89,7 @@ public class PodcastDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mPodcastJsonData = getArguments().getString(ARG_DATA);
+            subscribed = getArguments().getBoolean(ARG_SUBSCRIBED);
         }
 
     }
@@ -98,7 +99,7 @@ public class PodcastDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_podcast_detail, container, false);
-        FloatingActionButton fab = view.findViewById(R.id.fab_subscribe);
+        fab = view.findViewById(R.id.fab_subscribe);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,15 +107,15 @@ public class PodcastDetailFragment extends Fragment {
             }
         });
         if (mPodcastJsonData != null) {
-            posterIv = view.findViewById(R.id.iv_detail_poster);
+            ImageView posterIv = view.findViewById(R.id.iv_detail_poster);
             try {
                 currentPodcast = new Podcast(new JSONObject(mPodcastJsonData));
                 Picasso.with(getContext()).load(currentPodcast.getImagePath()).into(posterIv);
-                requestQueue = Volley.newRequestQueue(getContext());
+                RequestQueue requestQueue = Volley.newRequestQueue(getContext());
                 LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                 layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                 layoutManager.setAutoMeasureEnabled(true);
-                episodeRv = view.findViewById(R.id.rv_episode);
+                RecyclerView episodeRv = view.findViewById(R.id.rv_episode);
                 episodeRv.setLayoutManager(layoutManager);
                 episodeListAdapter = new EpisodeListAdapter(mListener);
                 episodeRv.setAdapter(episodeListAdapter);
@@ -128,10 +129,14 @@ public class PodcastDetailFragment extends Fragment {
                     }
                 };
                 requestQueue.add(NetworkUtils.getPodcastMeta(currentPodcast.getId(), responseListener));
+                if (!subscribed) {
+                    (new CheckSubscriptionStatusTask(getContext(), this)).execute(currentPodcast.getId());
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        updateFavImage(subscribed);
         return view;
     }
 
@@ -172,7 +177,14 @@ public class PodcastDetailFragment extends Fragment {
                 }
                 subscribed = false;
             }
-//            updateFavImage();
+            updateFavImage(subscribed);
+        }
+    }
+
+    private void updateFavImage(boolean subscribed) {
+        if (fab != null) {
+            //TODO: updateFavImage fab.setImageResource get resource
+//            fab.setImageResource(subscribed? );
         }
     }
 

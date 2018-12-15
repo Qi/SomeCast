@@ -56,8 +56,10 @@ public class FetchSubscriptionTask extends AsyncTask<Integer, Void, ArrayList<Ob
     protected void onPostExecute(ArrayList<Object> podcasts) {
         if (targetAdapter instanceof PodcastListAdapter) {
             ArrayList<Podcast> realPodcasts = new ArrayList<>();
-            for (Object p : podcasts)
+            for (Object p : podcasts) {
+                ((Podcast)p).setSubscribed(true);
                 realPodcasts.add((Podcast) p);
+            }
             ((PodcastListAdapter) targetAdapter).setData(realPodcasts);
         }
     }

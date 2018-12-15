@@ -9,6 +9,7 @@ public class Podcast {
     private String imagePath;
     private String id;
     private String rawData;
+    private boolean subscribed;
 
     public Podcast(JSONObject jsonObject) {
         try {
@@ -16,6 +17,7 @@ public class Podcast {
             podcastName = jsonObject.getString("title");
             imagePath = jsonObject.getString("image");
             id = jsonObject.getString("id");
+            subscribed = false;
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -35,5 +37,13 @@ public class Podcast {
 
     public String getRawData() {
         return rawData;
+    }
+
+    public boolean isSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
     }
 }

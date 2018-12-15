@@ -71,7 +71,7 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
 
         @Override
         public void onClick(View v) {
-            clickListener.onPodcastClicked(podcastList.get(getAdapterPosition()).getRawData());
+            clickListener.onPodcastClicked(podcastList.get(getAdapterPosition()).getRawData(), podcastList.get(getAdapterPosition()).isSubscribed());
         }
     }
 }

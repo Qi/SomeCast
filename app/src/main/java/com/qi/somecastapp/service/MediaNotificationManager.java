@@ -21,7 +21,6 @@ import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.os.BuildCompat;
 import android.util.Log;
 
 import com.qi.somecastapp.PodcastDetailActivity;
@@ -40,7 +39,7 @@ public class MediaNotificationManager {
     private static final String CHANNEL_ID = "com.qi.somecastapp.channel";
     private static final int REQUEST_CODE = 501;
 
-    private final MediaPlaybackService mService;
+    private final MyPodcastMediaService mService;
 
     private final NotificationCompat.Action mPlayAction;
     private final NotificationCompat.Action mPauseAction;
@@ -48,7 +47,7 @@ public class MediaNotificationManager {
     private final NotificationCompat.Action mPrevAction;
     private final NotificationManager mNotificationManager;
 
-    public MediaNotificationManager(MediaPlaybackService service) {
+    public MediaNotificationManager(MyPodcastMediaService service) {
         mService = service;
 
         mNotificationManager =

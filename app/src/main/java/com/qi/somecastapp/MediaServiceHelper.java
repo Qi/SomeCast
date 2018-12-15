@@ -15,7 +15,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import com.qi.somecastapp.model.Episode;
-import com.qi.somecastapp.service.MediaPlaybackService;
+import com.qi.somecastapp.service.MyPodcastMediaService;
 import com.qi.somecastapp.utilities.PlaybackMode;
 
 import java.util.ArrayList;
@@ -120,7 +120,7 @@ class MediaServiceHelper {
 
     /**
      * The internal state of the app needs to revert to what it looks like when it started before
-     * any connections to the {@link MediaPlaybackService} happens via the {@link MediaSessionCompat}.
+     * any connections to the {@link MyPodcastMediaService} happens via the {@link MediaSessionCompat}.
      */
     private void resetState() {
         performOnAllCallbacks(new CallbackCommand() {
@@ -187,7 +187,7 @@ class MediaServiceHelper {
             getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(targetIndex).getAudioPath()), null);
             nowPlayingIndex = targetIndex;
         } else {
-            //TODO: local prev track
+            getTransportControls().skipToPrevious();
         }
     }
 
@@ -200,8 +200,13 @@ class MediaServiceHelper {
                 nowPlayingIndex = nowPlayingIndex + 1;
             }
         } else {
-            //TODO: local next track
+            getTransportControls().skipToNext();
         }
+    }
+
+    public void playLocalContent(DownloadsFragment.Item episode) {
+        getTransportControls().playFromMediaId(episode.media.getMediaId(), null);
+        currentMode = PlaybackMode.LOCAL;
     }
 
     /**

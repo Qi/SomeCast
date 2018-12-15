@@ -37,7 +37,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".service.MediaPlaybackService"
+            android:name=".service.MyPodcastMediaService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

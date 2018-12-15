@@ -1,12 +1,8 @@
 package com.qi.somecastapp;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.media.browse.MediaBrowser;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
@@ -17,14 +13,10 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.qi.somecastapp.model.Episode;
-import com.qi.somecastapp.service.MediaPlaybackService;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE;
-import static com.qi.somecastapp.service.MediaPlaybackService.ROOT_ID;
+import static com.qi.somecastapp.service.MyPodcastMediaService.ROOT_ID;
 
 /**
  * A fragment representing a list of Items.
@@ -91,7 +83,8 @@ public class DownloadsFragment extends ListFragment {
         for (int i=0; i<N; i++) {
             mItems.add(new Item(children.get(i)));
         }
-        mAdapter.notifyDataSetChanged();
+        if (mAdapter != null)
+            mAdapter.notifyDataSetChanged();
     }
 
     private class Adapter extends BaseAdapter {

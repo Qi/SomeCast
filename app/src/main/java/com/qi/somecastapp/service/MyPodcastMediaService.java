@@ -23,13 +23,13 @@ import java.util.List;
 /**
  * Created by Qi Wu on 9/24/2018.
  */
-public class MediaPlaybackService extends MediaBrowserServiceCompat {
+public class MyPodcastMediaService extends MediaBrowserServiceCompat {
     public static final String ROOT_ID = "media_root_id";
     private static final String MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id";
     private static final String ALBUMS_ID = "podcast_album";
     private static final String FOLDERS_ID = "podcast_folder";
-    private static final String LOG_TAG = "MediaPlaybackService";
-    private static final String TAG = MediaPlaybackService.class.getSimpleName();
+    private static final String LOG_TAG = MyPodcastMediaService.class.getName();
+    private static final String TAG = MyPodcastMediaService.class.getSimpleName();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
     private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
 
@@ -165,7 +165,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             }
 
 //            final String mediaId = mPlaylist.get(mQueueIndex).getDescription().getMediaId();
-//            mPreparedMedia = MusicLibrary.getMetadata(MediaPlaybackService.this, mediaId);
+//            mPreparedMedia = MusicLibrary.getMetadata(MyPodcastMediaService.this, mediaId);
 //            mMediaSession.setMetadata(mPreparedMedia);
 
             if (!mMediaSession.isActive()) {
@@ -279,8 +279,8 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
                 if (!mServiceInStartedState) {
                     ContextCompat.startForegroundService(
-                            MediaPlaybackService.this,
-                            new Intent(MediaPlaybackService.this, MediaPlaybackService.class));
+                            MyPodcastMediaService.this,
+                            new Intent(MyPodcastMediaService.this, MyPodcastMediaService.class));
                     mServiceInStartedState = true;
                 }
 

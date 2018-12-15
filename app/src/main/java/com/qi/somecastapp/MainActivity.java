@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,7 +26,7 @@ import android.widget.ImageButton;
 
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.DownloadService;
-import com.qi.somecastapp.service.MediaPlaybackService;
+import com.qi.somecastapp.service.MyPodcastMediaService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private static final String TAG = MainActivity.class.getName();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
     private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
-    private static final String CHANNEL_ID = "com.qi.somecastapp.download.channel";
     private Toolbar toolbar;
     private BottomNavigationView navigation;
 //    private MediaBrowserCompat mMediaBrowser;
@@ -120,13 +118,13 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 //            };
 
     private void loadFragment(Fragment fragment) {
+        if (fragment instanceof DownloadsFragment && cachedChildren != null) {
+            ((DownloadsFragment) fragment).setFragmentData(cachedParentId, cachedChildren);
+        }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
-        if (fragment instanceof DownloadsFragment && cachedChildren != null) {
-            ((DownloadsFragment) fragment).setFragmentData(cachedParentId, cachedChildren);
-        }
     }
 
     @Override
@@ -139,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
-//        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MediaPlaybackService.class), mConnectionCallbacks, null);
+//        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MyPodcastMediaService.class), mConnectionCallbacks, null);
         mMediaServiceHelper = new MainActivity.MediaBrowserConnection(this);
         mMediaServiceHelper.registerCallback(new MainActivity.MediaBrowserListener());
     }
@@ -202,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         if (episode.media.getFlags() != FLAG_PLAYABLE) {
             mMediaServiceHelper.subscribeNewRoot(episode.media.getMediaId());
         } else {
-            //TODO:Play local
+            mMediaServiceHelper.playLocalContent(episode);
         }
 
     }
@@ -245,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
     private class MediaBrowserConnection extends MediaServiceHelper {
         public MediaBrowserConnection(Context context) {
-            super(context, MediaPlaybackService.class);
+            super(context, MyPodcastMediaService.class);
         }
 
         @Override

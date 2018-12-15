@@ -48,6 +48,7 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
     public void setData(ArrayList<Episode> data) {
         this.episodeList = data;
         notifyDataSetChanged();
+        mClickListener.onEpisodeSet(data);
     }
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {

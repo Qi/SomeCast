@@ -29,6 +29,7 @@ import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.DownloadService;
 import com.qi.somecastapp.service.MediaPlaybackService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE;
@@ -43,12 +44,13 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private Toolbar toolbar;
     private BottomNavigationView navigation;
 //    private MediaBrowserCompat mMediaBrowser;
-    private MediaBrowserHelper mMediaBrowserHelper;
+    private MediaServiceHelper mMediaServiceHelper;
     private boolean mIsPlaying;
     private ImageButton playPauseBt;
-    private int nowPlayingIndex = 0;
     private Fragment mCurrentFragment;
     private List<MediaBrowserCompat.MediaItem> cachedChildren;
+    private String cachedParentId;
+    private ArrayList<Episode> episodes;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -122,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         transaction.replace(R.id.frame_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+        if (fragment instanceof DownloadsFragment && cachedChildren != null) {
+            ((DownloadsFragment) fragment).setFragmentData(cachedParentId, cachedChildren);
+        }
     }
 
     @Override
@@ -135,8 +140,8 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
 //        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MediaPlaybackService.class), mConnectionCallbacks, null);
-        mMediaBrowserHelper = new MainActivity.MediaBrowserConnection(this);
-        mMediaBrowserHelper.registerCallback(new MainActivity.MediaBrowserListener());
+        mMediaServiceHelper = new MainActivity.MediaBrowserConnection(this);
+        mMediaServiceHelper.registerCallback(new MainActivity.MediaBrowserListener());
     }
 
     private boolean haveStoragePermission(int id) {
@@ -180,9 +185,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     public void onEpisodeClicked(Episode episode, View v) {
         switch (v.getId()) {
             case R.id.tv_episode_title:
-                nowPlayingIndex = episodes.indexOf(episode);
-                mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
-                mMediaBrowserHelper.playOnlineContent(Uri.parse(episode.getAudioPath()), null);
+                mMediaServiceHelper.playOnlineContent(episode, null);
                 break;
             case R.id.bt_download:
                 int targetIndex = episodes.indexOf(episode);
@@ -197,51 +200,50 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     public void onEpisodeClicked(DownloadsFragment.Item episode, View v) {
 
         if (episode.media.getFlags() != FLAG_PLAYABLE) {
-            mMediaBrowserHelper.subscribeNewRoot(episode.media.getMediaId());
+            mMediaServiceHelper.subscribeNewRoot(episode.media.getMediaId());
         } else {
             //TODO:Play local
         }
 
     }
 
+    @Override
+    public void onEpisodeSet(ArrayList<Episode> data) {
+        episodes = data;
+        mMediaServiceHelper.setOnlinePlaylist(episodes);
+    }
+
     private void startsDownload(int targetIndex){
         Intent intent = new Intent(this, DownloadService.class);
-        intent.putExtra(KEY_EPISODE_META, episodes.get(targetIndex).editPodcastName(currentPodcast.getPodcastName()));
+        intent.putExtra(KEY_EPISODE_META, episodes.get(targetIndex));
         startService(intent);
     }
 
     public void requestPreviousTrack(View view) {
-        int targetIndex = nowPlayingIndex == 0 ? nowPlayingIndex : nowPlayingIndex - 1 ;
-        mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episodes.get(targetIndex).getAudioPath()), null);
-        nowPlayingIndex = targetIndex;
+        mMediaServiceHelper.requestPreviousTrack();
     }
 
     public void replayTen(View view) {
-        mMediaBrowserHelper.getTransportControls().sendCustomAction(CUSTOM_ACTION_REPLAY_TEN, null);
+        mMediaServiceHelper.getTransportControls().sendCustomAction(CUSTOM_ACTION_REPLAY_TEN, null);
     }
 
     public void playPause(View view) {
         if (mIsPlaying) {
-            mMediaBrowserHelper.getTransportControls().pause();
+            mMediaServiceHelper.getTransportControls().pause();
         } else {
-            mMediaBrowserHelper.getTransportControls().play();
+            mMediaServiceHelper.getTransportControls().play();
         }
     }
 
     public void skipThirty(View view) {
-        mMediaBrowserHelper.getTransportControls().sendCustomAction(CUSTOM_ACTION_FORWARD_THIRTY, null);
+        mMediaServiceHelper.getTransportControls().sendCustomAction(CUSTOM_ACTION_FORWARD_THIRTY, null);
     }
 
     public void requestNextTrack(View view) {
-        if (nowPlayingIndex == episodes.size() - 1) {
-            mMediaBrowserHelper.getTransportControls().stop();
-        } else {
-            mMediaBrowserHelper.getTransportControls().playFromUri(Uri.parse(episodes.get(nowPlayingIndex + 1).getAudioPath()), null);
-            nowPlayingIndex = nowPlayingIndex + 1;
-        }
+        mMediaServiceHelper.requestNextTrack();
     }
 
-    private class MediaBrowserConnection extends MediaBrowserHelper {
+    private class MediaBrowserConnection extends MediaServiceHelper {
         public MediaBrowserConnection(Context context) {
             super(context, MediaPlaybackService.class);
         }
@@ -263,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
             if (mCurrentFragment instanceof DownloadsFragment) {
                 ((DownloadsFragment)mCurrentFragment).setFragmentData(parentId, children);
             } else {
+                cachedParentId = parentId;
                 cachedChildren = children;
             }
         }
@@ -307,14 +310,14 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     @Override
     public void onStart() {
         super.onStart();
-        mMediaBrowserHelper.onStart();
+        mMediaServiceHelper.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
 //        mSeekBarAudio.disconnectController();
-        mMediaBrowserHelper.onStop();
+        mMediaServiceHelper.onStop();
     }
 
     void buildTransportControls() {

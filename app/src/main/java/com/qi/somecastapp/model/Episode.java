@@ -18,7 +18,7 @@ public class Episode implements Parcelable {
     private String audioPath;
     private String podcastName;
 
-    public Episode(JSONObject json) {
+    public Episode(JSONObject json, String podcastName) {
         try {
             title = json.getString("title");
             date = json.getLong("pub_date_ms");
@@ -26,6 +26,7 @@ public class Episode implements Parcelable {
             length = json.getInt("audio_length");
             id = json.getString("id");
             audioPath = json.getString("audio");
+            this.podcastName = podcastName;
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -2,6 +2,7 @@ package com.qi.somecastapp;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.net.Uri;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +14,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
+import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.MediaPlaybackService;
 import com.qi.somecastapp.utilities.PlaybackMode;
 
@@ -22,8 +24,8 @@ import java.util.List;
 /**
  * Created by Qi Wu on 9/26/2018.
  */
-class MediaBrowserHelper {
-    private static final String TAG = MediaBrowserHelper.class.getSimpleName();
+class MediaServiceHelper {
+    private static final String TAG = MediaServiceHelper.class.getSimpleName();
 
     private final Context mContext;
     private final Class<? extends MediaBrowserServiceCompat> mMediaBrowserServiceClass;
@@ -38,10 +40,14 @@ class MediaBrowserHelper {
 
     private PlaybackMode currentMode;
 
+    private ArrayList<Episode> onlinePlaylist;
+
+    private int nowPlayingIndex = 0;
+
     @Nullable
     private MediaControllerCompat mMediaController;
 
-    public MediaBrowserHelper(Context context,
+    public MediaServiceHelper(Context context,
                               Class<? extends MediaBrowserServiceCompat> serviceClass) {
         mContext = context;
         mMediaBrowserServiceClass = serviceClass;
@@ -165,6 +171,39 @@ class MediaBrowserHelper {
         mMediaBrowser.subscribe(mMediaBrowser.getRoot(), mMediaBrowserSubscriptionCallback);
     }
 
+    public void setOnlinePlaylist(ArrayList<Episode> data) {
+        onlinePlaylist = data;
+    }
+
+    public void playOnlineContent(Episode episode, Object o) {
+        nowPlayingIndex = onlinePlaylist.indexOf(episode);
+        getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
+        currentMode = PlaybackMode.ONLINE;
+    }
+
+    public void requestPreviousTrack() {
+        if (currentMode == PlaybackMode.ONLINE) {
+            int targetIndex = nowPlayingIndex == 0 ? nowPlayingIndex : nowPlayingIndex - 1 ;
+            getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(targetIndex).getAudioPath()), null);
+            nowPlayingIndex = targetIndex;
+        } else {
+            //TODO: local prev track
+        }
+    }
+
+    public void requestNextTrack() {
+        if (currentMode == PlaybackMode.ONLINE) {
+            if (nowPlayingIndex == onlinePlaylist.size() - 1) {
+                getTransportControls().stop();
+            } else {
+                getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(nowPlayingIndex + 1).getAudioPath()), null);
+                nowPlayingIndex = nowPlayingIndex + 1;
+            }
+        } else {
+            //TODO: local next track
+        }
+    }
+
     /**
      * Helper for more easily performing operations on all listening clients.
      */
@@ -190,7 +229,7 @@ class MediaBrowserHelper {
                 mMediaControllerCallback.onPlaybackStateChanged(
                         mMediaController.getPlaybackState());
 
-                MediaBrowserHelper.this.onConnected(mMediaController);
+                MediaServiceHelper.this.onConnected(mMediaController);
             } catch (RemoteException e) {
                 Log.d(TAG, String.format("onConnected: Problem: %s", e.toString()));
                 throw new RuntimeException(e);
@@ -219,7 +258,7 @@ class MediaBrowserHelper {
         @Override
         public void onChildrenLoaded(@NonNull String parentId,
                                      @NonNull List<MediaBrowserCompat.MediaItem> children) {
-            MediaBrowserHelper.this.onChildrenLoaded(parentId, children);
+            MediaServiceHelper.this.onChildrenLoaded(parentId, children);
         }
     }
 
@@ -254,7 +293,7 @@ class MediaBrowserHelper {
             resetState();
             onPlaybackStateChanged(null);
 
-            MediaBrowserHelper.this.onDisconnected();
+            MediaServiceHelper.this.onDisconnected();
         }
     }
 }

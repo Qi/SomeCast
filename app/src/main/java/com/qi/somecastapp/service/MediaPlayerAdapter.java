@@ -3,14 +3,20 @@ package com.qi.somecastapp.service;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
+import android.media.MediaMetadata;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
 import com.qi.somecastapp.PodcastDetailActivity;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class MediaPlayerAdapter extends PlayerAdapter {
 
+    private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
     private final Context mContext;
     private MediaPlayer mMediaPlayer;
     private String mFilename;
@@ -26,15 +33,19 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     private MediaMetadataCompat mCurrentMedia;
     private int mState;
     private boolean mCurrentMediaPlayedToCompletion;
+    private DataModel mDataModel;
+    private List<MediaSessionCompat.QueueItem> mQueue;
+
 
     // Work-around for a MediaPlayer bug related to the behavior of MediaPlayer.seekTo()
     // while not playing.
     private int mSeekWhileNotPlaying = -1;
 
-    public MediaPlayerAdapter(Context context, PlaybackInfoListener listener) {
+    public MediaPlayerAdapter(Context context, PlaybackInfoListener listener, DataModel dataModel) {
         super(context);
         mContext = context.getApplicationContext();
         mPlaybackInfoListener = listener;
+        mDataModel = dataModel;
     }
 
     /**
@@ -65,14 +76,13 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
     // Implements PlaybackControl.
     @Override
-    public void playFromMedia(MediaMetadataCompat metadata) {
+    public void playFromMedia(String path, MediaMetadataCompat metadata) {
         mCurrentMedia = metadata;
-        final String mediaId = metadata.getDescription().getMediaId();
-//        playFile(MusicLibrary.getMusicFilename(mediaId));
+        playFile(path);
     }
 
     @Override
-    public void playFromUrl(String url) {
+    public void playFromUrl(String url, MediaMetadataCompat meta) {
         boolean mediaChanged = (mUrl == null || !mUrl.equals(url));
         if (mCurrentMediaPlayedToCompletion) {
             mediaChanged = true;
@@ -89,6 +99,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         mUrl = url;
         initializeMediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        if (meta != null) mCurrentMedia = meta;
         try {
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(url);
@@ -105,14 +116,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
     @Override
     public MediaMetadataCompat getCurrentMedia() {
-        return new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "1")
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "album")
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "artist")
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 10000)
-                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "genre")
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "title")
-                .build();
+        return mCurrentMedia;
     }
 
     private void playFile(String filename) {
@@ -137,11 +141,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         initializeMediaPlayer();
 
         try {
-            AssetFileDescriptor assetFileDescriptor = mContext.getAssets().openFd(mFilename);
-            mMediaPlayer.setDataSource(
-                    assetFileDescriptor.getFileDescriptor(),
-                    assetFileDescriptor.getStartOffset(),
-                    assetFileDescriptor.getLength());
+            mMediaPlayer.setDataSource(filename);
         } catch (Exception e) {
             throw new RuntimeException("Failed to open file: " + mFilename, e);
         }

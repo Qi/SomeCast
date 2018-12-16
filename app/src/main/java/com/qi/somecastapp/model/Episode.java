@@ -80,11 +80,6 @@ public class Episode implements Parcelable {
         return podcastName;
     }
 
-    public Episode editPodcastName(String podcastName) {
-        this.podcastName = podcastName;
-        return this;
-    }
-
     @Override
     public int describeContents() {
         return 0;

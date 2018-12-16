@@ -1,6 +1,6 @@
 package com.qi.somecastapp.utilities;
 
-public enum PlaybackMode {
+public enum EnumPlaybackMode {
     LOCAL,
     ONLINE,
     HYBRID

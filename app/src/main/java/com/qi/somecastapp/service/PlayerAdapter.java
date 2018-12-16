@@ -44,8 +44,8 @@ public abstract class PlayerAdapter {
         mAudioFocusHelper = new AudioFocusHelper();
     }
 
-    public abstract void playFromMedia(MediaMetadataCompat metadata);
-    public abstract void playFromUrl(String url);
+    public abstract void playFromMedia(String path, MediaMetadataCompat metadata);
+    public abstract void playFromUrl(String url, MediaMetadataCompat meta);
 
     public abstract MediaMetadataCompat getCurrentMedia();
 

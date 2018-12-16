@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.DownloadService;
 import com.qi.somecastapp.service.MyPodcastMediaService;
+import com.qi.somecastapp.utilities.EnumApplicationMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +40,10 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private static final String TAG = MainActivity.class.getName();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
     private static final String CUSTOM_ACTION_FORWARD_THIRTY = "forward_30";
+    private static final int INITIAL_CHECK = -1;
     private Toolbar toolbar;
     private BottomNavigationView navigation;
-//    private MediaBrowserCompat mMediaBrowser;
+    //    private MediaBrowserCompat mMediaBrowser;
     private MediaServiceHelper mMediaServiceHelper;
     private boolean mIsPlaying;
     private ImageButton playPauseBt;
@@ -64,20 +66,17 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
                     return true;
                 case R.id.navigation_discover:
                     toolbar.setTitle(R.string.title_discover);
-                    if (haveStoragePermission(-1)) {
-                        mCurrentFragment = new DiscoverFragment();
-                        loadFragment(mCurrentFragment);
-                        return true;
-                    }
-                    return false;
+                    mCurrentFragment = new DiscoverFragment();
+                    loadFragment(mCurrentFragment);
+                    return true;
                 case R.id.navigation_downloads:
                     toolbar.setTitle(R.string.title_downloads);
-                    if (haveStoragePermission(-2)) {
+                    if (haveStoragePermission(0)) {
                         mCurrentFragment = new DownloadsFragment();
                         loadFragment(mCurrentFragment);
                         return true;
                     }
-                    return false;
+                    return true;
             }
             return false;
         }
@@ -118,8 +117,11 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 //            };
 
     private void loadFragment(Fragment fragment) {
-        if (fragment instanceof DownloadsFragment && cachedChildren != null) {
-            ((DownloadsFragment) fragment).setFragmentData(cachedParentId, cachedChildren);
+        if (fragment instanceof DownloadsFragment) {
+            if (cachedChildren != null) {
+                ((DownloadsFragment) fragment).setFragmentData(cachedParentId, cachedChildren);
+                cachedChildren = null;
+            }
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_container, fragment);
@@ -146,15 +148,15 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG,"Have permission");
+                Log.d(TAG, "Have permission");
                 return true;
             } else {
-                Log.d(TAG,"Asking for permission");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, id);
+                Log.d(TAG, "Asking for permission");
+                if (id != INITIAL_CHECK)
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, id);
                 return false;
             }
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -162,11 +164,12 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-            if (requestCode < 0) {
-                mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(-1*requestCode));
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (requestCode == 0) {
+                mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(2));
             } else {
-                startsDownload(requestCode);
+                //1 based index was used for targetIndex because 0 is taken by other purpose
+                startsDownload(requestCode - 1);
             }
         } else {
             mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
@@ -184,11 +187,12 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     public void onEpisodeClicked(Episode episode, View v) {
         switch (v.getId()) {
             case R.id.tv_episode_title:
-                mMediaServiceHelper.playOnlineContent(episode, null);
+                mMediaServiceHelper.playOnlineContent(episode);
                 break;
             case R.id.bt_download:
                 int targetIndex = episodes.indexOf(episode);
-                if (haveStoragePermission(targetIndex)) {
+                //use 1 based index for targetIndex when requesting permission because 0 is taken by other purpose
+                if (haveStoragePermission(targetIndex + 1)) {
                     startsDownload(targetIndex);
                 }
                 break;
@@ -212,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         mMediaServiceHelper.setOnlinePlaylist(episodes);
     }
 
-    private void startsDownload(int targetIndex){
+    private void startsDownload(int targetIndex) {
         Intent intent = new Intent(this, DownloadService.class);
         intent.putExtra(KEY_EPISODE_META, episodes.get(targetIndex));
         startService(intent);
@@ -244,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
     private class MediaBrowserConnection extends MediaServiceHelper {
         public MediaBrowserConnection(Context context) {
-            super(context, MyPodcastMediaService.class);
+            super(context, MyPodcastMediaService.class, haveStoragePermission(INITIAL_CHECK));
         }
 
         @Override
@@ -258,11 +262,10 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
             super.onChildrenLoaded(parentId, children);
 
             final MediaControllerCompat mediaController = getMediaController();
-
             // Call prepare now so pressing play just works.
             mediaController.getTransportControls().prepare();
             if (mCurrentFragment instanceof DownloadsFragment) {
-                ((DownloadsFragment)mCurrentFragment).setFragmentData(parentId, children);
+                ((DownloadsFragment) mCurrentFragment).setFragmentData(parentId, children);
             } else {
                 cachedParentId = parentId;
                 cachedChildren = children;
@@ -277,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
                     playbackState.getState() == PlaybackStateCompat.STATE_PLAYING;
             if (playPauseBt != null)
                 playPauseBt.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),
-                        mIsPlaying?R.drawable.ic_baseline_pause_24px:R.drawable.ic_baseline_play_arrow_24px));
+                        mIsPlaying ? R.drawable.ic_baseline_pause_24px : R.drawable.ic_baseline_play_arrow_24px));
 //            mMediaControlsImage.setPressed(mIsPlaying);
         }
 

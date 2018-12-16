@@ -3,6 +3,7 @@ package com.qi.somecastapp;
 import android.content.ComponentName;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,10 +17,13 @@ import android.util.Log;
 
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.MyPodcastMediaService;
-import com.qi.somecastapp.utilities.PlaybackMode;
+import com.qi.somecastapp.utilities.EnumApplicationMode;
+import com.qi.somecastapp.utilities.EnumPlaybackMode;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
 
 /**
  * Created by Qi Wu on 9/26/2018.
@@ -38,7 +42,9 @@ class MediaServiceHelper {
 
     private MediaBrowserCompat mMediaBrowser;
 
-    private PlaybackMode currentMode;
+    private EnumPlaybackMode currentMode;
+
+    private boolean haveStoragePermission;
 
     private ArrayList<Episode> onlinePlaylist;
 
@@ -48,10 +54,11 @@ class MediaServiceHelper {
     private MediaControllerCompat mMediaController;
 
     public MediaServiceHelper(Context context,
-                              Class<? extends MediaBrowserServiceCompat> serviceClass) {
+                              Class<? extends MediaBrowserServiceCompat> serviceClass,
+                              boolean haveStoragePermission) {
         mContext = context;
         mMediaBrowserServiceClass = serviceClass;
-
+        this.haveStoragePermission = haveStoragePermission;
         mMediaBrowserConnectionCallback = new MediaBrowserConnectionCallback();
         mMediaControllerCallback = new MediaControllerCallback();
         mMediaBrowserSubscriptionCallback = new MediaBrowserSubscriptionCallback();
@@ -175,14 +182,16 @@ class MediaServiceHelper {
         onlinePlaylist = data;
     }
 
-    public void playOnlineContent(Episode episode, Object o) {
+    public void playOnlineContent(Episode episode) {
         nowPlayingIndex = onlinePlaylist.indexOf(episode);
-        getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), null);
-        currentMode = PlaybackMode.ONLINE;
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("123456", episode);
+        getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), bundle);
+        currentMode = EnumPlaybackMode.ONLINE;
     }
 
     public void requestPreviousTrack() {
-        if (currentMode == PlaybackMode.ONLINE) {
+        if (currentMode == EnumPlaybackMode.ONLINE) {
             int targetIndex = nowPlayingIndex == 0 ? nowPlayingIndex : nowPlayingIndex - 1 ;
             getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(targetIndex).getAudioPath()), null);
             nowPlayingIndex = targetIndex;
@@ -192,7 +201,7 @@ class MediaServiceHelper {
     }
 
     public void requestNextTrack() {
-        if (currentMode == PlaybackMode.ONLINE) {
+        if (currentMode == EnumPlaybackMode.ONLINE) {
             if (nowPlayingIndex == onlinePlaylist.size() - 1) {
                 getTransportControls().stop();
             } else {
@@ -206,7 +215,7 @@ class MediaServiceHelper {
 
     public void playLocalContent(DownloadsFragment.Item episode) {
         getTransportControls().playFromMediaId(episode.media.getMediaId(), null);
-        currentMode = PlaybackMode.LOCAL;
+        currentMode = EnumPlaybackMode.LOCAL;
     }
 
     /**
@@ -240,7 +249,7 @@ class MediaServiceHelper {
                 throw new RuntimeException(e);
             }
 
-            mMediaBrowser.subscribe(mMediaBrowser.getRoot(), mMediaBrowserSubscriptionCallback);
+            if (haveStoragePermission) mMediaBrowser.subscribe(mMediaBrowser.getRoot(), mMediaBrowserSubscriptionCallback);
         }
 
         @Override

@@ -17,7 +17,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.qi.somecastapp.model.Episode;
 
@@ -41,7 +40,7 @@ public class DownloadService extends Service {
 
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
-    HashMap<Long, MetaCorrectorRunnable> list = new HashMap<>();
+    HashMap<Long, MetaCorrectorRunnable> metadataCorrectorList = new HashMap<>();
     private DownloadManager downloadManager;
     private String TAG = DownloadService.class.getName();
 
@@ -65,7 +64,7 @@ public class DownloadService extends Service {
             long refId = downloadManager.enqueue(request);
             String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).getAbsolutePath() + "/" + fileName;
             MetaCorrectorRunnable corrector = new MetaCorrectorRunnable(filePath, episode, episode.getPodcastName());
-            list.put(refId, corrector);
+            metadataCorrectorList.put(refId, corrector);
         }
     }
 
@@ -88,7 +87,7 @@ public class DownloadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "New download task added. Task list size: " + list.size());
+        Log.d(TAG, "New download task added. Task metadataCorrectorList size: " + metadataCorrectorList.size());
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
@@ -134,6 +133,7 @@ public class DownloadService extends Service {
                 Tag tag = file.getTag();
                 tag.setField(FieldKey.TITLE,mEpisode.getTitle());
                 tag.setField(FieldKey.ALBUM, mAlbum);
+                tag.setField(FieldKey.ARTIST, mAlbum);
                 file.commit();
             } catch (CannotReadException e) {
                 e.printStackTrace();
@@ -161,8 +161,8 @@ public class DownloadService extends Service {
             long referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
             if (referenceId != -1) {
                 Log.d(TAG, "Setting metadata for task: " + referenceId);
-                (new Thread(list.get(referenceId))).run();
-                list.remove(referenceId);
+                (new Thread(metadataCorrectorList.get(referenceId))).run();
+                metadataCorrectorList.remove(referenceId);
             }
             MediaScannerConnection.scanFile(
                     getApplicationContext(),
@@ -177,8 +177,8 @@ public class DownloadService extends Service {
                         {
                         }
                     });
-            Log.d(TAG, "Remaining metadata to be set: " + list.size());
-            if (list.size() == 0) {
+            Log.d(TAG, "Remaining metadata to be set: " + metadataCorrectorList.size());
+            if (metadataCorrectorList.size() == 0) {
                 stopSelf();
             }
 

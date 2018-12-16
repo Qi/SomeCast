@@ -15,6 +15,7 @@ import android.provider.MediaStore.Audio.AudioColumns;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserServiceCompat;
 import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
@@ -105,9 +106,9 @@ public class DataModel {
         return mQueue;
     }
 
-    public MediaMetadata getMetadata(String key) {
+    public MediaMetadataCompat getMetadata(String key) {
         Cursor cursor = null;
-        MediaMetadata.Builder metadata = new MediaMetadata.Builder();
+        MediaMetadataCompat.Builder metadata = new MediaMetadataCompat.Builder();
         try {
             for (Uri uri : ALL_AUDIO_URI) {
                 cursor = mResolver.query(uri, null, AudioColumns.TITLE_KEY + " = ?",
@@ -206,7 +207,7 @@ public class DataModel {
                         int pathColumn = cursor.getColumnIndex(AudioColumns.DATA);
 
                         while (cursor.moveToNext()) {
-                            // We want to de-dupe paths of each of the songs so we get just a list
+                            // We want to de-dupe paths of each of the songs so we get just a metadataCorrectorList
                             // of containing directories.
                             String fullPath = cursor.getString(pathColumn);
                             int fileNameStart = fullPath.lastIndexOf(File.separator);
@@ -227,7 +228,7 @@ public class DataModel {
                 }
             }
 
-            // Take the list of deduplicated directories and put them into the results list with
+            // Take the metadataCorrectorList of deduplicated directories and put them into the results metadataCorrectorList with
             // the full directory path as the key so we can match on it later.
             List<MediaBrowserCompat.MediaItem> results = new ArrayList<>();
             for (String path : paths) {
@@ -322,7 +323,7 @@ public class DataModel {
                     // type yet. For example, the genres table doesn't seem to exist at all until
                     // the first time a song with a genre is encountered. If we hit an exception,
                     // the result is never sent causing the other end to hang up, which is a bad
-                    // thing. We can instead just be resilient and return an empty list.
+                    // thing. We can instead just be resilient and return an empty metadataCorrectorList.
                     Log.i(TAG, "Failed to execute query " + e);  // Stack trace is noisy.
                 } finally {
                     if (cursor != null) {

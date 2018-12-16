@@ -23,7 +23,11 @@ import com.qi.somecastapp.utilities.EnumPlaybackMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ALBUM;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ARTIST;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_DURATION;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_TITLE;
 
 /**
  * Created by Qi Wu on 9/26/2018.
@@ -185,7 +189,10 @@ class MediaServiceHelper {
     public void playOnlineContent(Episode episode) {
         nowPlayingIndex = onlinePlaylist.indexOf(episode);
         Bundle bundle = new Bundle();
-        bundle.putParcelable("123456", episode);
+        bundle.putString(KEY_EPISODE_TITLE, episode.getTitle());
+        bundle.putString(KEY_EPISODE_ALBUM, episode.getPodcastName());
+        bundle.putLong(KEY_EPISODE_DURATION, episode.getLength());
+        bundle.putString(KEY_EPISODE_ARTIST, episode.getPodcastName());
         getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), bundle);
         currentMode = EnumPlaybackMode.ONLINE;
     }

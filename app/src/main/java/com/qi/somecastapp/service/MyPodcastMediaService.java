@@ -23,7 +23,11 @@ import com.qi.somecastapp.utilities.EnumPlaybackMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ALBUM;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ARTIST;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_DURATION;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_TITLE;
 
 /**
  * Created by Qi Wu on 9/24/2018.
@@ -210,13 +214,11 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
             if (targetUri != null) {
                 MediaMetadataCompat meta = null;
                 if (extras != null) {
-                    Episode episode = extras.getParcelable("123456");
                     meta = new MediaMetadataCompat.Builder()
-                            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, episode.getId())
-                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, episode.getPodcastName())
-                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, episode.getLength())
-                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, episode.getTitle())
-                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, episode.getPodcastName())
+                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, extras.getString(KEY_EPISODE_ALBUM))
+                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, extras.getLong(KEY_EPISODE_DURATION))
+                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, extras.getString(KEY_EPISODE_TITLE))
+                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, extras.getString(KEY_EPISODE_ARTIST))
                             .build();
                 }
                 mPlayback.playFromUrl(targetUri.toString(), meta);

@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         if (fragment instanceof DownloadsFragment) {
             if (cachedChildren != null) {
                 ((DownloadsFragment) fragment).setFragmentData(cachedParentId, cachedChildren);
-                cachedChildren = null;
             }
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -264,12 +263,9 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
             final MediaControllerCompat mediaController = getMediaController();
             // Call prepare now so pressing play just works.
             mediaController.getTransportControls().prepare();
-            if (mCurrentFragment instanceof DownloadsFragment) {
-                ((DownloadsFragment) mCurrentFragment).setFragmentData(parentId, children);
-            } else {
-                cachedParentId = parentId;
-                cachedChildren = children;
-            }
+            cachedParentId = parentId;
+            cachedChildren = children;
+
         }
     }
 

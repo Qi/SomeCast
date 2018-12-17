@@ -1,7 +1,10 @@
 package com.qi.somecastapp.service;
 
 import android.app.Notification;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,8 +20,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import com.qi.somecastapp.R;
-import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.utilities.EnumPlaybackMode;
+import com.qi.somecastapp.utilities.SomePodcastAppConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,6 @@ import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_A
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ARTIST;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_DURATION;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ID;
-import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_TITLE;
 
 /**
@@ -88,7 +90,7 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
         setSessionToken(mMediaSession.getSessionToken());
         mMediaNotificationManager = new MediaNotificationManager(this);
         mPlayback = new MediaPlayerAdapter(this, new MediaPlayerListener(), mDataModel);
-
+        registerReceiver(broadcastReceiver, new IntentFilter(SomePodcastAppConstants.ACTION_DOWNLOAD_FINISHED));
     }
 
     @Override
@@ -102,6 +104,7 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
         mMediaNotificationManager.onDestroy();
         mPlayback.stop();
         mMediaSession.release();
+        unregisterReceiver(broadcastReceiver);
         Log.d(TAG, "onDestroy: MediaPlayerAdapter stopped, and MediaSession released");
     }
 
@@ -365,4 +368,14 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
         }
 
     }
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(SomePodcastAppConstants.ACTION_DOWNLOAD_FINISHED.equals(action)) {
+                notifyChildrenChanged("%Podcasts%");
+            }
+        }
+    };
 }

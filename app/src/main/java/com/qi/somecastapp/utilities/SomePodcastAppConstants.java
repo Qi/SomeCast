@@ -7,4 +7,5 @@ public class SomePodcastAppConstants {
     public static String KEY_EPISODE_DURATION = "episode_DURATION";
     public static String KEY_EPISODE_ARTIST = "episode_ARTIST";
     public static String KEY_EPISODE_ID = "episode_ID";
+    public static String ACTION_DOWNLOAD_FINISHED = "action_download_FINISHED";
 }

@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private boolean mIsPlaying;
     private ImageButton playPauseBt;
     private Fragment mCurrentFragment;
-    private int mCurrentMenuItem = -1;
     private List<MediaBrowserCompat.MediaItem> cachedChildren;
     private String cachedParentId;
     private ArrayList<Episode> episodes;
@@ -57,30 +56,34 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            if (mCurrentMenuItem != item.getItemId()) {
-                mCurrentMenuItem = item.getItemId();
                 switch (item.getItemId()) {
                     //TODO: change icons
                     case R.id.navigation_home:
+                        if (mCurrentFragment instanceof SubscriptionFragment)
+                            return false;
                         toolbar.setTitle(R.string.title_home);
                         mCurrentFragment = new SubscriptionFragment();
                         loadFragment(mCurrentFragment);
                         return true;
                     case R.id.navigation_discover:
+                        if (mCurrentFragment instanceof DiscoverFragment)
+                            return false;
                         toolbar.setTitle(R.string.title_discover);
                         mCurrentFragment = new DiscoverFragment();
                         loadFragment(mCurrentFragment);
                         return true;
                     case R.id.navigation_downloads:
+                        if (mCurrentFragment instanceof DownloadsFragment)
+                            return false;
                         toolbar.setTitle(R.string.title_downloads);
                         if (haveStoragePermission(0)) {
                             mCurrentFragment = new DownloadsFragment();
                             loadFragment(mCurrentFragment);
                             return true;
                         }
-                        return true;
+                        return false;
                 }
-            }
+
             return false;
         }
     };
@@ -352,4 +355,9 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
                 }
             };
 
+    @Override
+    public void onBackPressed() {
+        if (mCurrentFragment instanceof PodcastDetailFragment) super.onBackPressed();
+        else finish();
+    }
 }

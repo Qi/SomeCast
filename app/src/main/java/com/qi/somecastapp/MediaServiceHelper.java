@@ -180,7 +180,7 @@ class MediaServiceHelper {
     }
 
     public void subscribeNewRoot(String mediaId) {
-        mMediaBrowser.subscribe(mMediaBrowser.getRoot(), mMediaBrowserSubscriptionCallback);
+        mMediaBrowser.subscribe(mediaId, mMediaBrowserSubscriptionCallback);
     }
 
     public void setOnlinePlaylist(ArrayList<Episode> data) {
@@ -258,7 +258,7 @@ class MediaServiceHelper {
                 throw new RuntimeException(e);
             }
 
-            if (haveStoragePermission) mMediaBrowser.subscribe(mMediaBrowser.getRoot(), mMediaBrowserSubscriptionCallback);
+            if (haveStoragePermission) mMediaBrowser.subscribe("%Podcasts%", mMediaBrowserSubscriptionCallback);
         }
 
         @Override

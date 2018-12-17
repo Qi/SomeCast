@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.ACTION_DOWNLOAD_FINISHED;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
 
 public class DownloadService extends Service {
@@ -135,17 +136,7 @@ public class DownloadService extends Service {
                 tag.setField(FieldKey.ALBUM, mAlbum);
                 tag.setField(FieldKey.ARTIST, mAlbum);
                 file.commit();
-            } catch (CannotReadException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (TagException e) {
-                e.printStackTrace();
-            } catch (ReadOnlyFileException e) {
-                e.printStackTrace();
-            } catch (InvalidAudioFrameException e) {
-                e.printStackTrace();
-            } catch (CannotWriteException e) {
+            } catch (CannotReadException | IOException | ReadOnlyFileException | TagException | InvalidAudioFrameException | CannotWriteException e) {
                 e.printStackTrace();
             }
 
@@ -177,11 +168,13 @@ public class DownloadService extends Service {
                         {
                         }
                     });
+            Intent notifyChangeIntent = new Intent();
+            notifyChangeIntent.setAction(ACTION_DOWNLOAD_FINISHED);
+            sendBroadcast(notifyChangeIntent);
             Log.d(TAG, "Remaining metadata to be set: " + metadataCorrectorList.size());
             if (metadataCorrectorList.size() == 0) {
                 stopSelf();
             }
-
         }
     };
 }

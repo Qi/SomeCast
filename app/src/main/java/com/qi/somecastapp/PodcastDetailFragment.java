@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -121,6 +123,7 @@ public class PodcastDetailFragment extends Fragment {
                 RecyclerView episodeRv = view.findViewById(R.id.rv_episode);
                 episodeRv.setLayoutManager(layoutManager);
                 episodeListAdapter = new EpisodeListAdapter(mListener);
+                ((PlaybackController)getContext()).getMediaServiceHelper().registerCallback(this.new MediaBrowserListener());
                 episodeRv.setAdapter(episodeListAdapter);
                 toolbar.setTitle(currentPodcast.getPodcastName());
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
@@ -191,4 +194,13 @@ public class PodcastDetailFragment extends Fragment {
         }
     }
 
+    class MediaBrowserListener extends MediaControllerCompat.Callback{
+        @Override
+        public void onMetadataChanged(MediaMetadataCompat mediaMetadata) {
+            if (mediaMetadata == null) {
+                return;
+            }
+            episodeListAdapter.setNowPlayingEpisodeId(mediaMetadata.getDescription().getMediaId());
+        }
+    }
 }

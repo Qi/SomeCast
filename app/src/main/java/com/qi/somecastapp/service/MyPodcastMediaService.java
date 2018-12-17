@@ -26,6 +26,7 @@ import java.util.List;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ALBUM;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ARTIST;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_DURATION;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ID;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_TITLE;
 
@@ -219,7 +220,9 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
                             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, extras.getLong(KEY_EPISODE_DURATION))
                             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, extras.getString(KEY_EPISODE_TITLE))
                             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, extras.getString(KEY_EPISODE_ARTIST))
+                            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, extras.getString(KEY_EPISODE_ID))
                             .build();
+                    mMediaSession.setMetadata(meta);
                 }
                 mPlayback.playFromUrl(targetUri.toString(), meta);
                 currentMode = EnumPlaybackMode.ONLINE;
@@ -286,6 +289,7 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
             MediaSessionCompat.QueueItem current = mPlaylist.get(mQueueIndex);
             String path = current.getDescription().getExtras().getString(DataModel.PATH_KEY);
             MediaMetadataCompat metadata = mDataModel.getMetadata(current.getDescription().getMediaId());
+            mMediaSession.setMetadata(metadata);
             updateSessionQueueState();
             mPlayback.playFromMedia(path, metadata);
         }

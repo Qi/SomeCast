@@ -27,7 +27,6 @@ import android.widget.ImageButton;
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.DownloadService;
 import com.qi.somecastapp.service.MyPodcastMediaService;
-import com.qi.somecastapp.utilities.EnumApplicationMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.List;
 import static android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_META;
 
-public class MainActivity extends AppCompatActivity implements PodcastClickListener {
+public class MainActivity extends AppCompatActivity implements PodcastClickListener, PlaybackController {
 
     private static final String TAG = MainActivity.class.getName();
     private static final String CUSTOM_ACTION_REPLAY_TEN = "replay_10";
@@ -243,6 +242,11 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
     public void requestNextTrack(View view) {
         mMediaServiceHelper.requestNextTrack();
+    }
+
+    @Override
+    public MediaServiceHelper getMediaServiceHelper() {
+        return mMediaServiceHelper;
     }
 
     private class MediaBrowserConnection extends MediaServiceHelper {

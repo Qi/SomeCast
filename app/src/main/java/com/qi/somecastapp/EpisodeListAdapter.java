@@ -1,6 +1,7 @@
 package com.qi.somecastapp;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
     private ArrayList<Episode> episodeList;
     private Context mContext;
     private PodcastClickListener mClickListener;
+    private String nowPlayingEpisodeId;
 
     public EpisodeListAdapter(PodcastClickListener clickListener) {
         this.mClickListener = clickListener;
@@ -36,7 +38,14 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
     public void onBindViewHolder(Holder holder, int position) {
         if (episodeList != null) {
             holder.title.setText(episodeList.get(position).getTitle());
+            if(isNowPlayingEpisode(episodeList.get(position))){
+                holder.title.setTypeface(null, Typeface.BOLD_ITALIC);
+            }
         }
+    }
+
+    private boolean isNowPlayingEpisode(Episode episode) {
+        return episode.getId().equalsIgnoreCase(nowPlayingEpisodeId);
     }
 
     @Override
@@ -49,6 +58,11 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
         this.episodeList = data;
         notifyDataSetChanged();
         mClickListener.onEpisodeSet(data);
+    }
+
+    void setNowPlayingEpisodeId(String mediaId) {
+        nowPlayingEpisodeId = mediaId;
+        notifyDataSetChanged();
     }
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {

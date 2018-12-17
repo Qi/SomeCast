@@ -88,6 +88,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
             mediaChanged = true;
             mCurrentMediaPlayedToCompletion = false;
         }
+        mFilename = null;
         if (!mediaChanged) {
             if (!isPlaying()) {
                 play();
@@ -120,7 +121,8 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     }
 
     private void playFile(String filename) {
-        boolean mediaChanged = (mFilename == null || !filename.equals(mFilename));
+        boolean mediaChanged = (mFilename == null || !mFilename.equals(filename));
+        mUrl = null;
         if (mCurrentMediaPlayedToCompletion) {
             // Last audio file was played to completion, the resourceId hasn't changed, but the
             // player was released, so force a reload of the media file for playback.

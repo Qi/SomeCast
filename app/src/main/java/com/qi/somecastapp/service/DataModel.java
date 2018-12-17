@@ -129,6 +129,8 @@ public class DataModel {
                                 cursor.getString(album));
                         metadata.putLong(MediaMetadata.METADATA_KEY_DURATION,
                                 cursor.getLong(duration));
+                        metadata.putString(MediaMetadata.METADATA_KEY_MEDIA_ID,
+                                key);
 
                         String albumArt = null;
                         Uri albumArtUri = ContentUris.withAppendedId(ART_BASE_URI,

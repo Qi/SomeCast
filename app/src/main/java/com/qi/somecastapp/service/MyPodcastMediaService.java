@@ -89,7 +89,7 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
         // Set the session's token so that client activities can communicate with it.
         setSessionToken(mMediaSession.getSessionToken());
         mMediaNotificationManager = new MediaNotificationManager(this);
-        mPlayback = new MediaPlayerAdapter(this, new MediaPlayerListener(), mDataModel);
+        mPlayback = new MediaPlayerAdapter(this, new MediaPlayerListener());
         registerReceiver(broadcastReceiver, new IntentFilter(SomePodcastAppConstants.ACTION_DOWNLOAD_FINISHED));
     }
 

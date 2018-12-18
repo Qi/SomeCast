@@ -1,23 +1,15 @@
 package com.qi.somecastapp.service;
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
-import android.media.MediaMetadata;
 import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
-
-import com.qi.somecastapp.PodcastDetailActivity;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Qi Wu on 9/26/2018.
@@ -33,25 +25,22 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     private MediaMetadataCompat mCurrentMedia;
     private int mState;
     private boolean mCurrentMediaPlayedToCompletion;
-    private DataModel mDataModel;
-    private List<MediaSessionCompat.QueueItem> mQueue;
 
 
     // Work-around for a MediaPlayer bug related to the behavior of MediaPlayer.seekTo()
     // while not playing.
     private int mSeekWhileNotPlaying = -1;
 
-    public MediaPlayerAdapter(Context context, PlaybackInfoListener listener, DataModel dataModel) {
+    public MediaPlayerAdapter(Context context, PlaybackInfoListener listener) {
         super(context);
         mContext = context.getApplicationContext();
         mPlaybackInfoListener = listener;
-        mDataModel = dataModel;
     }
 
     /**
      * Once the {@link MediaPlayer} is released, it can't be used again, and another one has to be
-     * created. In the onStop() method of the {@link PodcastDetailActivity} the {@link MediaPlayer} is
-     * released. Then in the onStart() of the {@link PodcastDetailActivity} a new {@link MediaPlayer}
+     * created. In the onStop() method of the Activity the {@link MediaPlayer} is
+     * released. Then in the onStart() of the Activity a new {@link MediaPlayer}
      * object has to be created. That's why this method is private, and called by load(int) and
      * not the constructor.
      */

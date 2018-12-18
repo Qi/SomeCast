@@ -31,11 +31,6 @@
             android:authorities="com.qi.somecast.subscribed"
             android:exported="false" />
 
-        <activity
-            android:name=".PodcastDetailActivity"
-            android:label="@string/title_activity_podcast_detail"
-            android:theme="@style/AppTheme.NoActionBar" />
-
         <service
             android:name=".service.MyPodcastMediaService"
             android:enabled="true"

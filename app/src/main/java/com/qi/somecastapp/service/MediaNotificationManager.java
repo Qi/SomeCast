@@ -23,7 +23,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.qi.somecastapp.PodcastDetailActivity;
+import com.qi.somecastapp.MainActivity;
 import com.qi.somecastapp.R;
 
 
@@ -188,7 +188,7 @@ public class MediaNotificationManager {
     }
 
     private PendingIntent createContentIntent() {
-        Intent openUI = new Intent(mService, PodcastDetailActivity.class);
+        Intent openUI = new Intent(mService, MainActivity.class);
         openUI.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(
                 mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);

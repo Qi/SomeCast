@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.qi.somecastapp.model.Episode;
@@ -41,11 +42,21 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
             if(isNowPlayingEpisode(episodeList.get(position))){
                 holder.title.setTypeface(null, Typeface.BOLD_ITALIC);
             }
+            if(isDownloadedEpisode(episodeList.get(position))){
+                holder.downloadBt.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
     private boolean isNowPlayingEpisode(Episode episode) {
         return episode.getId().equalsIgnoreCase(nowPlayingEpisodeId);
+    }
+
+    private boolean isDownloadedEpisode(Episode episode) {
+        for (String path : ((PlaybackController) mContext).getDownloadedEpisodeList()) {
+            if (path.contains(episode.getId())) return true;
+        }
+        return false;
     }
 
     @Override
@@ -67,7 +78,7 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
-        Button downloadBt;
+        ImageButton downloadBt;
         public Holder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tv_episode_title);

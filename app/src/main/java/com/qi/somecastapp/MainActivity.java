@@ -256,6 +256,16 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         return mMediaServiceHelper;
     }
 
+    @Override
+    public ArrayList<String> getDownloadedEpisodeList() {
+        ArrayList<String> downloadedEpisodeIdList = new ArrayList<>();
+        for(MediaBrowserCompat.MediaItem item : cachedChildren) {
+            downloadedEpisodeIdList.add(item.getDescription().getExtras().getString("PATH"));
+            Log.d("MediaIds", item.getDescription().getExtras().getString("PATH"));
+        }
+        return downloadedEpisodeIdList;
+    }
+
     private class MediaBrowserConnection extends MediaServiceHelper {
         public MediaBrowserConnection(Context context) {
             super(context, MyPodcastMediaService.class, haveStoragePermission(INITIAL_CHECK));
@@ -276,7 +286,6 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
             mediaController.getTransportControls().prepare();
             cachedParentId = parentId;
             cachedChildren = children;
-
         }
     }
 

@@ -222,8 +222,8 @@ class MediaServiceHelper {
         }
     }
 
-    public void playLocalContent(DownloadsFragment.Item episode) {
-        getTransportControls().playFromMediaId(episode.media.getMediaId(), null);
+    public void playLocalContent(String mediaId) {
+        getTransportControls().playFromMediaId(mediaId, null);
         currentMode = EnumPlaybackMode.LOCAL;
     }
 

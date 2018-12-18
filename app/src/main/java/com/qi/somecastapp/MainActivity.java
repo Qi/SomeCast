@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         if (episode.media.getFlags() != FLAG_PLAYABLE) {
             mMediaServiceHelper.subscribeNewRoot(episode.media.getMediaId());
         } else {
-            mMediaServiceHelper.playLocalContent(episode);
+            mMediaServiceHelper.playLocalContent(episode.media.getMediaId());
         }
 
     }
@@ -219,6 +219,11 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     public void onEpisodeSet(ArrayList<Episode> data) {
         episodes = data;
         mMediaServiceHelper.setOnlinePlaylist(episodes);
+    }
+
+    @Override
+    public void onEpisodeClicked(int downloadedEpisode) {
+        mMediaServiceHelper.playLocalContent(cachedChildren.get(downloadedEpisode).getMediaId());
     }
 
     private void startsDownload(int targetIndex) {

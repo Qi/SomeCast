@@ -42,7 +42,7 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
             if(isNowPlayingEpisode(episodeList.get(position))){
                 holder.title.setTypeface(null, Typeface.BOLD_ITALIC);
             }
-            if(isDownloadedEpisode(episodeList.get(position))){
+            if(isDownloadedEpisode(episodeList.get(position)) != -1){
                 holder.downloadBt.setVisibility(View.INVISIBLE);
             }
         }
@@ -52,11 +52,12 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
         return episode.getId().equalsIgnoreCase(nowPlayingEpisodeId);
     }
 
-    private boolean isDownloadedEpisode(Episode episode) {
-        for (String path : ((PlaybackController) mContext).getDownloadedEpisodeList()) {
-            if (path.contains(episode.getId())) return true;
+    private int isDownloadedEpisode(Episode episode) {
+        ArrayList<String> pathList = ((PlaybackController) mContext).getDownloadedEpisodeList();
+        for (String path : pathList) {
+            if (path.contains(episode.getId())) return pathList.indexOf(path);
         }
-        return false;
+        return -1;
     }
 
     @Override
@@ -89,7 +90,11 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
 
         @Override
         public void onClick(View v) {
-            mClickListener.onEpisodeClicked(episodeList.get(getAdapterPosition()), v);
+            if (isDownloadedEpisode(episodeList.get(getAdapterPosition())) == -1) {
+                mClickListener.onEpisodeClicked(episodeList.get(getAdapterPosition()), v);
+            } else {
+                mClickListener.onEpisodeClicked(isDownloadedEpisode(episodeList.get(getAdapterPosition())));
+            }
         }
     }
 }

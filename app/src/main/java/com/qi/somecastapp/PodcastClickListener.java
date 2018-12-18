@@ -11,5 +11,7 @@ interface PodcastClickListener {
     void onEpisodeClicked(Episode episode, View v);
     void onEpisodeClicked(DownloadsFragment.Item episode, View v);
     void onEpisodeSet(ArrayList<Episode> data);
+
+    void onEpisodeClicked(int downloadedEpisode);
 }
 

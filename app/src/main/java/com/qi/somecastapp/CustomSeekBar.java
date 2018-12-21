@@ -21,6 +21,7 @@ public class CustomSeekBar extends AppCompatSeekBar {
     private OnSeekBarChangeListener mOnSeekBarChangeListener = new OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
         }
 
         @Override
@@ -122,7 +123,7 @@ public class CustomSeekBar extends AppCompatSeekBar {
                     ? (int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
                     : 0;
             setProgress(0);
-            setMax(max);
+            setMax(max/10);
         }
 
         @Override

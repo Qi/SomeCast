@@ -19,52 +19,66 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_weight="0.5"
+            android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/previous_bt"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="requestPreviousTrack"
-                android:src="@drawable/ic_baseline_skip_previous_24px" />
+                android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/replay_10_bt"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="replayTen"
-                android:src="@drawable/ic_baseline_replay_10_24px" />
+                <ImageButton
+                    android:id="@+id/previous_bt"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="requestPreviousTrack"
+                    android:src="@drawable/ic_baseline_skip_previous_24px" />
 
-            <ImageButton
-                android:id="@+id/play_pause_bt"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="playPause"
-                android:src="@drawable/ic_baseline_play_arrow_24px" />
+                <ImageButton
+                    android:id="@+id/replay_10_bt"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="replayTen"
+                    android:src="@drawable/ic_baseline_replay_10_24px" />
 
-            <ImageButton
-                android:id="@+id/skip_30_bt"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="skipThirty"
-                android:src="@drawable/ic_baseline_forward_30_24px" />
+                <ImageButton
+                    android:id="@+id/play_pause_bt"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="playPause"
+                    android:src="@drawable/ic_baseline_play_arrow_24px" />
 
-            <ImageButton
-                android:id="@+id/next_bt"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="0dp"
+                <ImageButton
+                    android:id="@+id/skip_30_bt"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="skipThirty"
+                    android:src="@drawable/ic_baseline_forward_30_24px" />
+
+                <ImageButton
+                    android:id="@+id/next_bt"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="requestNextTrack"
+                    android:src="@drawable/ic_baseline_skip_next_24px" />
+            </LinearLayout>
+
+            <com.qi.somecastapp.CustomSeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="requestNextTrack"
-                android:src="@drawable/ic_baseline_skip_next_24px" />
+                android:progress="50" />
+
         </LinearLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </LinearLayout>

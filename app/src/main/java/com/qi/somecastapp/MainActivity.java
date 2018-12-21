@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private List<MediaBrowserCompat.MediaItem> cachedChildren;
     private String cachedParentId;
     private ArrayList<Episode> episodes;
+    private CustomSeekBar progressBar;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -140,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         playPauseBt = findViewById(R.id.play_pause_bt);
+        progressBar = findViewById(R.id.seekBar);
         setSupportActionBar(toolbar);
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -278,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
         @Override
         protected void onConnected(@NonNull MediaControllerCompat mediaController) {
-//            mSeekBarAudio.setMediaController(mediaController);
+            progressBar.setMediaController(mediaController);
         }
 
         @Override
@@ -339,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     @Override
     public void onStop() {
         super.onStop();
-//        mSeekBarAudio.disconnectController();
+        progressBar.disconnectController();
         mMediaServiceHelper.onStop();
     }
 

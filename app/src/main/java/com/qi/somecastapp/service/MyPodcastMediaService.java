@@ -220,7 +220,7 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
                 if (extras != null) {
                     meta = new MediaMetadataCompat.Builder()
                             .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, extras.getString(KEY_EPISODE_ALBUM))
-                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, extras.getLong(KEY_EPISODE_DURATION))
+                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, extras.getLong(KEY_EPISODE_DURATION)*1000)
                             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, extras.getString(KEY_EPISODE_TITLE))
                             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, extras.getString(KEY_EPISODE_ARTIST))
                             .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, extras.getString(KEY_EPISODE_ID))

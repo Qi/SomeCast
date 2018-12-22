@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ALBUM;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ALBUM_ART_PATH;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ARTIST;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_DURATION;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ID;
@@ -195,6 +196,7 @@ class MediaServiceHelper {
         bundle.putLong(KEY_EPISODE_DURATION, episode.getLength());
         bundle.putString(KEY_EPISODE_ARTIST, episode.getPodcastName());
         bundle.putString(KEY_EPISODE_ID, episode.getId());
+        bundle.putString(KEY_EPISODE_ALBUM_ART_PATH, episode.getPodcastArt());
         getTransportControls().playFromUri(Uri.parse(episode.getAudioPath()), bundle);
         currentMode = EnumPlaybackMode.ONLINE;
     }

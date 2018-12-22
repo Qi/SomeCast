@@ -54,6 +54,7 @@ class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.Holder>
 
     private int isDownloadedEpisode(Episode episode) {
         ArrayList<String> pathList = ((PlaybackController) mContext).getDownloadedEpisodeList();
+        if (pathList == null) return -1;
         for (String path : pathList) {
             if (path.contains(episode.getId())) return pathList.indexOf(path);
         }

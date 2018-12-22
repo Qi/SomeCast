@@ -23,10 +23,13 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.qi.somecastapp.model.Episode;
 import com.qi.somecastapp.service.DownloadService;
 import com.qi.somecastapp.service.MyPodcastMediaService;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
     private String cachedParentId;
     private ArrayList<Episode> episodes;
     private CustomSeekBar progressBar;
+    private ImageView slidingAlbum;
+    private TextView slidingTitle;
+    private TextView slidingDescription;
+    private TextView slidingPodcastName;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -149,6 +156,10 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 //        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MyPodcastMediaService.class), mConnectionCallbacks, null);
         mMediaServiceHelper = new MainActivity.MediaBrowserConnection(this);
         mMediaServiceHelper.registerCallback(new MainActivity.MediaBrowserListener());
+        slidingAlbum = findViewById(R.id.slide_album_iv);
+        slidingTitle = findViewById(R.id.slide_title);
+        slidingDescription = findViewById(R.id.slide_description);
+        slidingPodcastName = findViewById(R.id.slide_podcast);
     }
 
     private boolean haveStoragePermission(int id) {
@@ -265,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
     @Override
     public ArrayList<String> getDownloadedEpisodeList() {
+        if (cachedChildren == null) return null;
         ArrayList<String> downloadedEpisodeIdList = new ArrayList<>();
         for(MediaBrowserCompat.MediaItem item : cachedChildren) {
             downloadedEpisodeIdList.add(item.getDescription().getExtras().getString("PATH"));
@@ -312,13 +324,11 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
             if (mediaMetadata == null) {
                 return;
             }
-//            mTitleTextView.setText(
-//                    mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-//            mArtistTextView.setText(
-//                    mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
-//            mAlbumArt.setImageBitmap(MusicLibrary.getAlbumBitmap(
-//                    MainActivity.this,
-//                    mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)));
+            slidingTitle.setText(
+                    mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
+            slidingPodcastName.setText(
+                    mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
+            Picasso.with(getApplicationContext()).load(mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)).into(slidingAlbum);
         }
 
         @Override

@@ -45,12 +45,12 @@ public class JsonUtils {
         return null;
     }
 
-    public static ArrayList<Episode> parseEpisodes(String response, String podcastName) {
+    public static ArrayList<Episode> parseEpisodes(String response, String podcastName, String podcastArt) {
         try {
             JSONArray json = new JSONObject(response).getJSONArray("episodes");
             ArrayList<Episode> episodes = new ArrayList<>();
             for (int i = 0; i < json.length(); i++) {
-                episodes.add(new Episode(json.getJSONObject(i), podcastName));
+                episodes.add(new Episode(json.getJSONObject(i), podcastName, podcastArt));
             }
             return episodes;
         } catch (JSONException e) {

@@ -17,8 +17,9 @@ public class Episode implements Parcelable {
     private String id;
     private String audioPath;
     private String podcastName;
+    private String podcastArt;
 
-    public Episode(JSONObject json, String podcastName) {
+    public Episode(JSONObject json, String podcastName, String albumArt) {
         try {
             title = json.getString("title");
             date = json.getLong("pub_date_ms");
@@ -27,6 +28,7 @@ public class Episode implements Parcelable {
             id = json.getString("id");
             audioPath = json.getString("audio");
             this.podcastName = podcastName;
+            this.podcastArt = albumArt;
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -50,6 +52,7 @@ public class Episode implements Parcelable {
         id = in.readString();
         audioPath = in.readString();
         podcastName = in.readString();
+        podcastArt = in.readString();
     }
 
     public String getTitle() {
@@ -80,6 +83,10 @@ public class Episode implements Parcelable {
         return podcastName;
     }
 
+    public String getPodcastArt() {
+        return podcastArt;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -106,5 +113,6 @@ public class Episode implements Parcelable {
         dest.writeString(id);
         dest.writeString(audioPath);
         dest.writeString(podcastName);
+        dest.writeString(podcastArt);
     }
 }

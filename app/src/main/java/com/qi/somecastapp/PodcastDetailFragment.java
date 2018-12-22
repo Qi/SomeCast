@@ -130,7 +130,7 @@ public class PodcastDetailFragment extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, response);
-                        episodes = JsonUtils.parseEpisodes(response, currentPodcast.getPodcastName());
+                        episodes = JsonUtils.parseEpisodes(response, currentPodcast.getPodcastName(), currentPodcast.getImagePath());
                         episodeListAdapter.setData(episodes);
                     }
                 };

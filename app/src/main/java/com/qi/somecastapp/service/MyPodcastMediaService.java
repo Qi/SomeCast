@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ALBUM;
+import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ALBUM_ART_PATH;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ARTIST;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_DURATION;
 import static com.qi.somecastapp.utilities.SomePodcastAppConstants.KEY_EPISODE_ID;
@@ -224,6 +225,7 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
                             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, extras.getString(KEY_EPISODE_TITLE))
                             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, extras.getString(KEY_EPISODE_ARTIST))
                             .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, extras.getString(KEY_EPISODE_ID))
+                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, extras.getString(KEY_EPISODE_ALBUM_ART_PATH))
                             .build();
                     mMediaSession.setMetadata(meta);
                 }

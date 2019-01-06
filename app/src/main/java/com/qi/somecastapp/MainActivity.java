@@ -96,40 +96,6 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         }
     };
 
-//    private final MediaBrowserCompat.ConnectionCallback mConnectionCallbacks =
-//            new MediaBrowserCompat.ConnectionCallback() {
-//                @Override
-//                public void onConnected() {
-//
-//                    // Get the token for the MediaSession
-//                    MediaSessionCompat.Token token = mMediaBrowser.getSessionToken();
-//
-//                    // Create a MediaControllerCompat
-//                    MediaControllerCompat mediaController = null;
-//                    try {
-//                        mediaController = new MediaControllerCompat(MainActivity.this, // Context
-//                                token);
-//                    } catch (RemoteException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    // Save the controller
-//                    MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
-//
-//                    // Register a Callback to stay in sync
-//                    mediaController.registerCallback(controllerCallback);                }
-//
-//                @Override
-//                public void onConnectionSuspended() {
-//                    // The Service has crashed. Disable transport controls until it automatically reconnects
-//                }
-//
-//                @Override
-//                public void onConnectionFailed() {
-//                    // The Service has refused our connection
-//                }
-//            };
-
     private void loadFragment(Fragment fragment) {
         if (fragment instanceof DownloadsFragment) {
             if (cachedChildren != null) {
@@ -153,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
-//        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MyPodcastMediaService.class), mConnectionCallbacks, null);
         mMediaServiceHelper = new MainActivity.MediaBrowserConnection(this);
         mMediaServiceHelper.registerCallback(new MainActivity.MediaBrowserListener());
         slidingAlbum = findViewById(R.id.slide_album_iv);
@@ -330,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
                     mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
             slidingPodcastName.setText(
                     mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
+            slidingDescription.setText(mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION));
             Picasso.with(getApplicationContext()).load(mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)).into(slidingAlbum);
         }
 
@@ -356,32 +322,6 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         progressBar.disconnectController();
         mMediaServiceHelper.onStop();
     }
-
-    void buildTransportControls() {
-//        // Grab the view for the play/pause button
-//        mPlayPause = (ImageView) findViewById(R.id.play_pause)
-        //TODO: Fix buildTransportControls()
-        MediaControllerCompat mediaController = MediaControllerCompat.getMediaController(MainActivity.this);
-
-        // Display the initial state
-        MediaMetadataCompat metadata = mediaController.getMetadata();
-        PlaybackStateCompat pbState = mediaController.getPlaybackState();
-
-        // Register a Callback to stay in sync
-        mediaController.registerCallback(controllerCallback);
-    }
-
-    private MediaControllerCompat.Callback controllerCallback =
-            new MediaControllerCompat.Callback() {
-                @Override
-                public void onMetadataChanged(MediaMetadataCompat metadata) {
-                }
-
-                @Override
-                public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                    int a = 1;
-                }
-            };
 
     @Override
     public void onBackPressed() {

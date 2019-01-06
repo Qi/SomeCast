@@ -271,6 +271,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
     @Override
     public void replayTenSeconds() {
+        if (mMediaPlayer == null) return;
         if (mMediaPlayer.getCurrentPosition() > 10000) {
             mMediaPlayer.seekTo(mMediaPlayer.getCurrentPosition()-10000);
         } else {
@@ -280,6 +281,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
     @Override
     public void forwardThirtySeconds() {
+        if (mMediaPlayer == null) return;
         if (mMediaPlayer.getCurrentPosition() < mMediaPlayer.getDuration() - 30000) {
             mMediaPlayer.seekTo(mMediaPlayer.getCurrentPosition() + 30000);
         } else {

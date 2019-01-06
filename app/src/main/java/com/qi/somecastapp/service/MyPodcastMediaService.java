@@ -242,6 +242,7 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
 
         @Override
         public void onSkipToNext() {
+            if (mPlaylist.size() == 0) return;
             mQueueIndex = (++mQueueIndex % mPlaylist.size());
             mPreparedMedia = null;
             onPlay();

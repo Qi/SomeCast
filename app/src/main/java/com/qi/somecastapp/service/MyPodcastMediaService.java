@@ -172,9 +172,9 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
                 return;
             }
 
-//            final String mediaId = mPlaylist.get(mQueueIndex).getDescription().getMediaId();
-//            mPreparedMedia = MusicLibrary.getMetadata(MyPodcastMediaService.this, mediaId);
-//            mMediaSession.setMetadata(mPreparedMedia);
+            final String mediaId = mPlaylist.get(mQueueIndex).getDescription().getMediaId();
+            mPreparedMedia = mDataModel.getMetadata(mediaId);
+            mMediaSession.setMetadata(mPreparedMedia);
 
             if (!mMediaSession.isActive()) {
                 mMediaSession.setActive(true);
@@ -244,15 +244,23 @@ public class MyPodcastMediaService extends MediaBrowserServiceCompat {
         public void onSkipToNext() {
             if (mPlaylist.size() == 0) return;
             mQueueIndex = (++mQueueIndex % mPlaylist.size());
-            mPreparedMedia = null;
-            onPlay();
+            MediaSessionCompat.QueueItem current = mPlaylist.get(mQueueIndex);
+            String path = current.getDescription().getExtras().getString(DataModel.PATH_KEY);
+            MediaMetadataCompat metadata = mDataModel.getMetadata(current.getDescription().getMediaId());
+            mMediaSession.setMetadata(metadata);
+            updateSessionQueueState();
+            mPlayback.playFromMedia(path, metadata);
         }
 
         @Override
         public void onSkipToPrevious() {
             mQueueIndex = mQueueIndex > 0 ? mQueueIndex - 1 : mPlaylist.size() - 1;
-            mPreparedMedia = null;
-            onPlay();
+            MediaSessionCompat.QueueItem current = mPlaylist.get(mQueueIndex);
+            String path = current.getDescription().getExtras().getString(DataModel.PATH_KEY);
+            MediaMetadataCompat metadata = mDataModel.getMetadata(current.getDescription().getMediaId());
+            mMediaSession.setMetadata(metadata);
+            updateSessionQueueState();
+            mPlayback.playFromMedia(path, metadata);
         }
 
         @Override

@@ -204,8 +204,16 @@ class MediaServiceHelper {
     public void requestPreviousTrack() {
         if (currentMode == EnumPlaybackMode.ONLINE) {
             int targetIndex = nowPlayingIndex == 0 ? nowPlayingIndex : nowPlayingIndex - 1 ;
-            getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(targetIndex).getAudioPath()), null);
             nowPlayingIndex = targetIndex;
+            Episode episode = onlinePlaylist.get(nowPlayingIndex);
+            Bundle bundle = new Bundle();
+            bundle.putString(KEY_EPISODE_TITLE, episode.getTitle());
+            bundle.putString(KEY_EPISODE_ALBUM, episode.getPodcastName());
+            bundle.putLong(KEY_EPISODE_DURATION, episode.getLength());
+            bundle.putString(KEY_EPISODE_ARTIST, episode.getPodcastName());
+            bundle.putString(KEY_EPISODE_ID, episode.getId());
+            bundle.putString(KEY_EPISODE_ALBUM_ART_PATH, episode.getPodcastArt());
+            getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(targetIndex).getAudioPath()), bundle);
         } else {
             getTransportControls().skipToPrevious();
         }
@@ -216,8 +224,16 @@ class MediaServiceHelper {
             if (nowPlayingIndex == onlinePlaylist.size() - 1) {
                 getTransportControls().stop();
             } else {
-                getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(nowPlayingIndex + 1).getAudioPath()), null);
                 nowPlayingIndex = nowPlayingIndex + 1;
+                Episode episode = onlinePlaylist.get(nowPlayingIndex);
+                Bundle bundle = new Bundle();
+                bundle.putString(KEY_EPISODE_TITLE, episode.getTitle());
+                bundle.putString(KEY_EPISODE_ALBUM, episode.getPodcastName());
+                bundle.putLong(KEY_EPISODE_DURATION, episode.getLength());
+                bundle.putString(KEY_EPISODE_ARTIST, episode.getPodcastName());
+                bundle.putString(KEY_EPISODE_ID, episode.getId());
+                bundle.putString(KEY_EPISODE_ALBUM_ART_PATH, episode.getPodcastArt());
+                getTransportControls().playFromUri(Uri.parse(onlinePlaylist.get(nowPlayingIndex + 1).getAudioPath()), bundle);
             }
         } else {
             getTransportControls().skipToNext();

@@ -33,7 +33,13 @@ public class JsonUtils {
 
     public static ArrayList<Podcast> parsePodcastInGenre(String response) {
         try {
-            JSONArray json = new JSONObject(response).getJSONArray("channels");
+            JSONObject responseJson = new JSONObject(response);
+            JSONArray json;
+            if (responseJson.has("channels")) {
+                json = responseJson.getJSONArray("channels");
+            } else {
+                json = responseJson.getJSONArray("results");
+            }
             ArrayList<Podcast> genres = new ArrayList<>();
             for (int i = 0; i < json.length(); i++) {
                 genres.add(new Podcast(json.getJSONObject(i)));

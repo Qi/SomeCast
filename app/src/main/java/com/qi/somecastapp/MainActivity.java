@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         playPauseBt = findViewById(R.id.play_pause_bt);
         progressBar = findViewById(R.id.seekBar);
         setSupportActionBar(toolbar);
-        navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
 //        mMediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MyPodcastMediaService.class), mConnectionCallbacks, null);
@@ -185,12 +185,14 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (requestCode == 0) {
                 mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(2));
+                navigation.getMenu().getItem(2).setChecked(true);
             } else {
                 //1 based index was used for targetIndex because 0 is taken by other purpose
                 startsDownload(requestCode - 1);
             }
         } else {
             mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
+            navigation.getMenu().getItem(0).setChecked(true);
         }
     }
 
@@ -383,7 +385,20 @@ public class MainActivity extends AppCompatActivity implements PodcastClickListe
 
     @Override
     public void onBackPressed() {
-        if (mCurrentFragment instanceof PodcastDetailFragment) super.onBackPressed();
-        else finish();
+        if (mCurrentFragment instanceof PodcastDetailFragment) {
+            super.onBackPressed();
+        }
+        else if (mCurrentFragment instanceof DiscoverFragment) {
+            if (!((DiscoverFragment) mCurrentFragment).onBackPressed()) {
+                mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
+                navigation.getMenu().getItem(0).setChecked(true);
+            }
+        }
+        else if (!(mCurrentFragment instanceof SubscriptionFragment)){
+            mOnNavigationItemSelectedListener.onNavigationItemSelected(navigation.getMenu().getItem(0));
+            navigation.getMenu().getItem(0).setChecked(true);
+        } else {
+            finish();
+        }
     }
 }

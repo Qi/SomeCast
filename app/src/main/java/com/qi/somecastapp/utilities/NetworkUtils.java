@@ -26,21 +26,31 @@ public final class NetworkUtils {
             "https://listennotes.p.mashape.com/api/v1/genres";
     private static final String BASE_PODCAST_URL =
             "https://listennotes.p.mashape.com/api/v1/best_podcasts?";
-    private static final String Base_PODCAST_META_URL =
+    private static final String BASE_PODCAST_META_URL =
             "https://listennotes.p.mashape.com/api/v1/podcasts/";
+    private static final String BASE_SEARCH_URL =
+            "https://listennotes.p.mashape.com/api/v1/search?language=English&len_max=10&len_min=2&offset=0&only_in=title&sort_by_date=0&type=podcast";
 
     private final static String KEY_PARAM = "X-Mashape-Key";
     private final static String LANG_PARAM = "language";
     private final static String PAGE_PRAM = "page";
     private final static String GENRE_ID_PRAM = "genre_id";
     private final static String ACCEPT = "Accept";
-    private final static String ACCEPT_PARMA = "Accept";
+    private final static String ACCEPT_PARMA = "application/json";
     private static final String lang = "en-US";
 
 
     public static StringRequest getGenreList(Response.Listener<String> responseListener) {
         String uri = Uri.parse(BASE_GENRE_URL)
                 .buildUpon()
+                .build().toString();
+        return getStringRequest(uri, responseListener);
+    }
+
+    //"https://listennotes.p.mashape.com/api/v1/search?language=English&len_max=10&len_min=2&offset=0&only_in=title&q=star+wars&sort_by_date=0&type=podcast"
+    public static StringRequest searchPodcast(String searchText, Response.Listener<String> responseListener) {
+        String uri = Uri.parse(BASE_SEARCH_URL).buildUpon()
+                .appendQueryParameter("q", searchText)
                 .build().toString();
         return getStringRequest(uri, responseListener);
     }
@@ -77,7 +87,7 @@ public final class NetworkUtils {
 //"https://listennotes.p.mashape.com/api/v1/podcasts/9d6939745ed34e3aab0eb78a408ab40d/"
     public static StringRequest getPodcastMeta(String id, Response.Listener<String> responseListener) {
         //TODO: get more episodes
-        String uri = Uri.parse(Base_PODCAST_META_URL + id + "/").buildUpon()
+        String uri = Uri.parse(BASE_PODCAST_META_URL + id + "/").buildUpon()
                 .build().toString();
         return getStringRequest(uri, responseListener);
     }

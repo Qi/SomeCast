@@ -21,19 +21,32 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
     private Context mContext;
     private PodcastClickListener clickListener;
     private ArrayList<Podcast> podcastList;
+    public final static int VERTICAL = 1;
+    public final static int HORIZONTAL = 0;
+    private int orientation = HORIZONTAL;
+
 
     public PodcastListAdapter(PodcastClickListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    public PodcastListAdapter(PodcastClickListener clickListener, int orientation) {
+        this.clickListener = clickListener;
+        this.orientation = orientation;
     }
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View parentView = inflater.inflate(R.layout.podcast_view_holder, parent, false);
-        int width = parent.getMeasuredWidth();
-        parentView.setMinimumWidth(width/3);
-
+        View parentView;
+        if (orientation == HORIZONTAL) {
+            parentView = inflater.inflate(R.layout.podcast_view_holder, parent, false);
+            int width = parent.getMeasuredWidth();
+            parentView.setMinimumWidth(width/3);
+        } else {
+            parentView = inflater.inflate(R.layout.podcast_search_result_holder, parent, false);
+        }
         return new Holder(parentView);
     }
 

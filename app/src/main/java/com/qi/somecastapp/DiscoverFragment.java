@@ -8,9 +8,12 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -31,6 +34,8 @@ public class DiscoverFragment extends Fragment {
     private RequestQueue requestQueue;
     private GenreListAdapter genreAdapter;
     private PodcastClickListener mListener;
+    private PodcastListAdapter searchResultAdapter;
+    private RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -57,7 +62,7 @@ public class DiscoverFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
         requestQueue = Volley.newRequestQueue(getContext());
-        Response.Listener<String> responseListener = new Response.Listener<String>(){
+        Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, response);
@@ -66,25 +71,42 @@ public class DiscoverFragment extends Fragment {
         };
         requestQueue.add(NetworkUtils.getGenreList(responseListener));
         genreAdapter = new GenreListAdapter(requestQueue, mListener);
+        searchResultAdapter = new PodcastListAdapter(mListener, PodcastListAdapter.VERTICAL);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_discover_list, container, false);
+        recyclerView = view.findViewById(R.id.rv_genre_list);
+        Button searchBt = view.findViewById(R.id.search_button);
+        final TextView searchText = view.findViewById(R.id.search_box);
+        searchBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerView.setAdapter(searchResultAdapter);
+                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, response);
+                        searchResultAdapter.setData(JsonUtils.parsePodcastInGenre(response));
+                    }
+                };
+                requestQueue.add(NetworkUtils.searchPodcast(searchText.getText().toString(), responseListener));
+            }
+        });
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(genreAdapter);
+        Context context = view.getContext();
+
+        if (mColumnCount <= 1) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        recyclerView.setAdapter(genreAdapter);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         return view;
     }
 
@@ -104,5 +126,14 @@ public class DiscoverFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public boolean onBackPressed() {
+        if(recyclerView.getAdapter() instanceof PodcastListAdapter) {
+            recyclerView.setAdapter(genreAdapter);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

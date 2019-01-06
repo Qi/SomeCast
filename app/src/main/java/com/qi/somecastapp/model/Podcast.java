@@ -10,17 +10,21 @@ public class Podcast {
     private String id;
     private String rawData;
     private boolean subscribed;
+    private String TAG = "Podcast";
 
     public Podcast(JSONObject jsonObject) {
+        rawData = jsonObject.toString();
         try {
-            rawData = jsonObject.toString();
-            podcastName = jsonObject.getString("title");
+            if (jsonObject.has("title"))
+                podcastName = jsonObject.getString("title");
+            else
+                podcastName = jsonObject.getString("title_original");
             imagePath = jsonObject.getString("image");
             id = jsonObject.getString("id");
-            subscribed = false;
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        subscribed = false;
     }
 
     public String getPodcastName() {

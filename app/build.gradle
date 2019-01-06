@@ -48,4 +48,5 @@ dependencies {
         exclude group: 'com.android.support'
     }
     implementation files('libs/jaudiotagger-2.2.6-SNAPSHOT.jar')
+    implementation 'com.github.mancj:MaterialSearchBar:0.8.1'
 }

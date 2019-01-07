@@ -65,7 +65,7 @@ public class SubscriptionFragment extends Fragment{
         subscriptionRv.setHasFixedSize(true);
         LinearLayoutManager layoutManager;
         RecyclerView.Adapter adapter;
-        layoutManager = new GridLayoutManager(getContext(), 3);
+        layoutManager = new GridLayoutManager(getContext(), 4);
         adapter = new PodcastListAdapter(mListener);
         new FetchSubscriptionTask(adapter, getContext()).execute(PODCAST_SCREEN);
         subscriptionRv.setLayoutManager(layoutManager);

@@ -18,28 +18,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/searchBar" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/search_box"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text"
-            android:layout_weight="5"
-            android:text="Name" />
-
-        <Button
-            android:id="@+id/search_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Search"
-            android:onClick="onSearchPodcast"/>
-    </LinearLayout>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_genre_list"
         android:layout_width="match_parent"

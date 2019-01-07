@@ -42,7 +42,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'eu.the4thfloor.volley:com.android.volley:2015.05.28'
     implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.7.2'
     implementation('com.sothree.slidinguppanel:library:3.4.0') {
         exclude group: 'com.android.support'

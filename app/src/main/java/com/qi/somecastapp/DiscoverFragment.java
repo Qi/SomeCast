@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,13 +19,18 @@ import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
+
+import java.util.List;
+
+import static android.widget.LinearLayout.VERTICAL;
 
 /**
  * A fragment representing a list of Items.
  */
-public class DiscoverFragment extends Fragment {
+public class DiscoverFragment extends Fragment implements MaterialSearchBar.OnSearchActionListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -36,6 +42,7 @@ public class DiscoverFragment extends Fragment {
     private PodcastClickListener mListener;
     private PodcastListAdapter searchResultAdapter;
     private RecyclerView recyclerView;
+    private MaterialSearchBar searchBar;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -79,34 +86,27 @@ public class DiscoverFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_discover_list, container, false);
         recyclerView = view.findViewById(R.id.rv_genre_list);
-        Button searchBt = view.findViewById(R.id.search_button);
-        final TextView searchText = view.findViewById(R.id.search_box);
-        searchBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recyclerView.setAdapter(searchResultAdapter);
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG, response);
-                        searchResultAdapter.setData(JsonUtils.parsePodcastInGenre(response));
-                    }
-                };
-                requestQueue.add(NetworkUtils.searchPodcast(searchText.getText().toString(), responseListener));
-            }
-        });
 
         // Set the adapter
         Context context = view.getContext();
-
+        RecyclerView.LayoutManager layoutManager;
         if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            layoutManager = new LinearLayoutManager(context);
+            recyclerView.setLayoutManager(layoutManager);
         } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+            layoutManager = new GridLayoutManager(context, mColumnCount);
+            recyclerView.setLayoutManager(layoutManager);
         }
         recyclerView.setAdapter(genreAdapter);
-
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        searchBar = view.findViewById(R.id.searchBar);
+        searchBar.setHint("Search Podcast");
+        searchBar.setSpeechMode(false);
+        //enable searchbar callbacks
+        searchBar.setOnSearchActionListener(this);
+        searchBar.setCardViewElevation(10);
         return view;
     }
 
@@ -135,5 +135,28 @@ public class DiscoverFragment extends Fragment {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void onSearchStateChanged(boolean enabled) {
+        if (!enabled) onBackPressed();
+    }
+
+    @Override
+    public void onSearchConfirmed(CharSequence text) {
+        recyclerView.setAdapter(searchResultAdapter);
+        Response.Listener<String> responseListener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+                searchResultAdapter.setData(JsonUtils.parsePodcastInGenre(response));
+            }
+        };
+        requestQueue.add(NetworkUtils.searchPodcast(text.toString(), responseListener));
+    }
+
+    @Override
+    public void onButtonClicked(int buttonCode) {
+
     }
 }

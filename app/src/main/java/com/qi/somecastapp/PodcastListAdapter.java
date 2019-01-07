@@ -24,6 +24,7 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
     public final static int VERTICAL = 1;
     public final static int HORIZONTAL = 0;
     private int orientation = HORIZONTAL;
+    private int width;
 
 
     public PodcastListAdapter(PodcastClickListener clickListener) {
@@ -40,10 +41,9 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
         mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View parentView;
+        width = parent.getMeasuredWidth();
         if (orientation == HORIZONTAL) {
             parentView = inflater.inflate(R.layout.podcast_view_holder, parent, false);
-            int width = parent.getMeasuredWidth();
-            parentView.setMinimumWidth(width/3);
         } else {
             parentView = inflater.inflate(R.layout.podcast_search_result_holder, parent, false);
         }
@@ -54,6 +54,7 @@ public class PodcastListAdapter extends RecyclerView.Adapter<PodcastListAdapter.
     public void onBindViewHolder(Holder holder, int position) {
         if(podcastList != null) {
             Picasso.with(mContext).load(podcastList.get(position).getImagePath()).into(holder.mPosterImageView);
+            holder.mPosterImageView.setMaxHeight(width/4);
             holder.showNameTv.setText(podcastList.get(position).getPodcastName());
         }
     }

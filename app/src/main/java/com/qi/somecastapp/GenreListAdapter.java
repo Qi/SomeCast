@@ -1,6 +1,7 @@
 package com.qi.somecastapp;
 
 import android.content.Context;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -78,8 +79,8 @@ class GenreListAdapter extends RecyclerView.Adapter<GenreListAdapter.GenreHolder
             super(itemView);
             genreName = itemView.findViewById(R.id.tv_genre_name);
             podcastRv = itemView.findViewById(R.id.rv_podcast_list_in_genre);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(itemView.getContext());
-            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            GridLayoutManager layoutManager = new GridLayoutManager(mContext, 4);
+            podcastRv.setHasFixedSize(true);
             podcastRv.setLayoutManager(layoutManager);
             adapter = new PodcastListAdapter(mClickListener);
             podcastRv.setAdapter(adapter);

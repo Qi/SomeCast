@@ -128,16 +128,18 @@ public class DownloadsFragment extends ListFragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+                convertView = mInflater.inflate(R.layout.downloaded_episode_holder, parent, false);
             }
 
-            final TextView tv = (TextView)convertView;
+            final TextView tvEpisodeTitle = convertView.findViewById(R.id.tv_episode_title);
+            final TextView tvPodcastTitle = convertView.findViewById(R.id.tv_podcast_title);
             final Item item = mItems.get(position);
-            tv.setText(item.media.getDescription().getTitle());
+            tvEpisodeTitle.setText(item.media.getDescription().getTitle());
+            tvPodcastTitle.setText(item.media.getDescription().getSubtitle());
             if (isNowPlayingEpisode(item.media.getDescription().getMediaId())){
-                tv.setTypeface(null, Typeface.BOLD_ITALIC);
+                tvEpisodeTitle.setTypeface(null, Typeface.BOLD_ITALIC);
             } else {
-                tv.setTypeface(null, Typeface.NORMAL);
+                tvEpisodeTitle.setTypeface(null, Typeface.NORMAL);
             }
             return convertView;
         }

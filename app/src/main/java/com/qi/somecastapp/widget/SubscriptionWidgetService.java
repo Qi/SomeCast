@@ -4,18 +4,24 @@ import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.qi.somecastapp.R;
+import com.qi.somecastapp.database.SubscribedContract;
 import com.qi.somecastapp.model.Podcast;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-class SubscriptionWidgetService extends RemoteViewsService {
+
+public class SubscriptionWidgetService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         int widgetId = intent.getData() != null ?
@@ -43,7 +49,26 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     @Override
     public void onDataSetChanged() {
-//        list = loadListPref(mContext, widgetId);
+        list = querySubscription();
+    }
+
+    private ArrayList<Podcast> querySubscription() {
+        ArrayList<Podcast> podcasts = new ArrayList<>();
+        Cursor cursor = mContext.getContentResolver().query(SubscribedContract.SubscribedEntry.CONTENT_URI, null, null, null, null);
+        if (cursor != null) {
+            int indexForJson = cursor.getColumnIndex(SubscribedContract.SubscribedEntry.COLUMN_PODCAST_META);
+            while (cursor.moveToNext()) {
+                try {
+                    JSONObject json = new JSONObject(cursor.getString(indexForJson));
+                    Podcast temp = new Podcast(json);
+                    podcasts.add(temp);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            cursor.close();
+        }
+        return podcasts;
     }
 
     @Override
@@ -57,7 +82,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     @Override
     public RemoteViews getViewAt(int i) {
-        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.podcast_search_result_holder);
+        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.podcast_widget_holder);
         views.setTextViewText(R.id.tv_show_name, list.get(i).getPodcastName());
         try {
             Bitmap b = Picasso.with(mContext).load(list.get(i).getImagePath()).get();

@@ -1,7 +1,10 @@
 package com.qi.somecastapp;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +30,7 @@ import com.qi.somecastapp.model.Podcast;
 import com.qi.somecastapp.utilities.CheckSubscriptionStatusTask;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
+import com.qi.somecastapp.widget.SubscriptionList;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -183,6 +187,12 @@ public class PodcastDetailFragment extends Fragment {
                 }
                 subscribed = false;
             }
+            AppWidgetManager widgetManager = AppWidgetManager.getInstance(getContext());
+            int[] appWidgetIds = widgetManager.getAppWidgetIds(new ComponentName(getContext(), SubscriptionList.class));
+
+            Intent i = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE, null, getContext(), SubscriptionList.class);
+            i.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+            getActivity().sendBroadcast(i);
             updateFavImage(subscribed);
         }
     }
@@ -191,6 +201,7 @@ public class PodcastDetailFragment extends Fragment {
         if (fab != null) {
             //TODO: updateFavImage fab.setImageResource get resource
 //            fab.setImageResource(subscribed? );
+
         }
     }
 

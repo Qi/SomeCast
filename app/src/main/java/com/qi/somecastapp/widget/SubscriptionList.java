@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.widget.RemoteViews;
 
 import com.qi.somecastapp.R;
@@ -20,7 +21,7 @@ public class SubscriptionList extends AppWidgetProvider {
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.subscription_list);
         Intent intent = new Intent(context, SubscriptionWidgetService.class);
-//        intent.setData(Uri.fromParts("content", String.valueOf(appWidgetId), null));
+        intent.setData(Uri.fromParts("content", String.valueOf(appWidgetId), null));
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         views.setRemoteAdapter(R.id.widget_list_view, intent);
         // Instruct the widget manager to update the widget

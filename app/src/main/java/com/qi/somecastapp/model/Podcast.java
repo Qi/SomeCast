@@ -27,6 +27,10 @@ public class Podcast {
         subscribed = false;
     }
 
+    public Podcast() {
+
+    }
+
     public String getPodcastName() {
         return podcastName;
     }
@@ -49,5 +53,9 @@ public class Podcast {
 
     public void setSubscribed(boolean subscribed) {
         this.subscribed = subscribed;
+    }
+
+    public void setPodcastName(String name) {
+        podcastName = name;
     }
 }

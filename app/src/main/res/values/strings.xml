@@ -112,4 +112,11 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="my_subscription">My Subscription</string>
+    <string name="previous_track_button">Previous Track Button</string>
+    <string name="replay_10_seconds_button">Replay 10 Seconds Button</string>
+    <string name="play_pause_button">Play Pause Button</string>
+    <string name="skip_30_seconds_button">Skip 30 Seconds Button</string>
+    <string name="next_track_button">Next Track Button</string>
+    <string name="download_button">Download Button</string>
+    <string name="podcast_cover_image">Podcast Cover Image</string>
 </resources>

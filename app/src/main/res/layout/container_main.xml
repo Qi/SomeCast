@@ -34,7 +34,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="requestPreviousTrack"
-                    android:src="@drawable/ic_baseline_skip_previous_24px" />
+                    android:src="@drawable/ic_baseline_skip_previous_24px"
+                    android:contentDescription="@string/previous_track_button" />
 
                 <ImageButton
                     android:id="@+id/replay_10_bt"
@@ -43,7 +44,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="replayTen"
-                    android:src="@drawable/ic_baseline_replay_10_24px" />
+                    android:src="@drawable/ic_baseline_replay_10_24px"
+                    android:contentDescription="@string/replay_10_seconds_button" />
 
                 <ImageButton
                     android:id="@+id/play_pause_bt"
@@ -52,7 +54,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="playPause"
-                    android:src="@drawable/ic_baseline_play_arrow_24px" />
+                    android:src="@drawable/ic_baseline_play_arrow_24px"
+                    android:contentDescription="@string/play_pause_button" />
 
                 <ImageButton
                     android:id="@+id/skip_30_bt"
@@ -61,7 +64,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="skipThirty"
-                    android:src="@drawable/ic_baseline_forward_30_24px" />
+                    android:src="@drawable/ic_baseline_forward_30_24px"
+                    android:contentDescription="@string/skip_30_seconds_button" />
 
                 <ImageButton
                     android:id="@+id/next_bt"
@@ -70,7 +74,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="requestNextTrack"
-                    android:src="@drawable/ic_baseline_skip_next_24px" />
+                    android:src="@drawable/ic_baseline_skip_next_24px"
+                    android:contentDescription="@string/next_track_button" />
             </LinearLayout>
 
             <com.qi.somecastapp.CustomSeekBar
@@ -88,23 +93,21 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/slide_album_iv"
+                    android:layout_toEndOf="@id/slide_album_iv"
                     android:layout_alignTop="@id/slide_album_iv"
-                    android:id="@+id/slide_title"
-                    android:text="Title of episode"/>
+                    android:id="@+id/slide_title"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/slide_album_iv"
+                    android:layout_toEndOf="@id/slide_album_iv"
                     android:id="@+id/slide_podcast"
                     android:layout_below="@id/slide_title"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/slide_album_iv"
+                    android:layout_toEndOf="@id/slide_album_iv"
                     android:id="@+id/slide_description"
-                    android:layout_below="@id/slide_podcast"
-                    android:text="long description of the episode or the podcast, it's long and maybe very long "/>
+                    android:layout_below="@id/slide_podcast" />
             </RelativeLayout>
 
 

@@ -27,7 +27,8 @@
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.5" />
+                app:layout_collapseParallaxMultiplier="0.5"
+                android:contentDescription="@string/podcast_cover_image" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

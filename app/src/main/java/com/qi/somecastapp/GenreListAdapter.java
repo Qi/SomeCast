@@ -1,6 +1,7 @@
 package com.qi.somecastapp;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.qi.somecastapp.model.Genre;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
@@ -27,6 +29,7 @@ class GenreListAdapter extends RecyclerView.Adapter<GenreListAdapter.GenreHolder
     private RequestQueue mRequestQueue;
     private PodcastClickListener mClickListener;
     private final String TAG = this.getClass().getSimpleName();
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public GenreListAdapter(RequestQueue requestQueue, PodcastClickListener clickListener) {
         mRequestQueue = requestQueue;
@@ -52,6 +55,10 @@ class GenreListAdapter extends RecyclerView.Adapter<GenreListAdapter.GenreHolder
             holder.genreName.setText(genreList.get(position).getName());
 
             if (holder.adapter.getItemCount() == 0) {
+                mFirebaseAnalytics = FirebaseAnalytics.getInstance(mContext);
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "API called!");
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 Response.Listener<String> responseListener = new Response.Listener<String>(){
                     @Override
                     public void onResponse(String response) {

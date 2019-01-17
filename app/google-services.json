@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "133841317564",
+    "firebase_url": "https://somepodcastapp.firebaseio.com",
+    "project_id": "somepodcastapp",
+    "storage_bucket": "somepodcastapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133841317564:android:3c937127b8a07c26",
+        "android_client_info": {
+          "package_name": "com.qi.somecastapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133841317564-pp3qmcfp741jp55f27oohefo8vkime74.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCC914SidaOH0EjO2ehR-RfwnOrU3rCSK0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

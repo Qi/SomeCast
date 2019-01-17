@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.qi.somecastapp.utilities.JsonUtils;
 import com.qi.somecastapp.utilities.NetworkUtils;
@@ -43,6 +44,7 @@ public class DiscoverFragment extends Fragment implements MaterialSearchBar.OnSe
     private PodcastListAdapter searchResultAdapter;
     private RecyclerView recyclerView;
     private MaterialSearchBar searchBar;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -68,6 +70,10 @@ public class DiscoverFragment extends Fragment implements MaterialSearchBar.OnSe
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "API called!");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
         requestQueue = Volley.newRequestQueue(getContext());
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override

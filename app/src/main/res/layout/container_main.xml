@@ -89,7 +89,8 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/slide_album_iv"/>
+                    android:id="@+id/slide_album_iv"
+                    android:contentDescription="@string/now_playing_podcast_cover" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

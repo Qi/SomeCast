@@ -119,4 +119,6 @@
     <string name="next_track_button">Next Track Button</string>
     <string name="download_button">Download Button</string>
     <string name="podcast_cover_image">Podcast Cover Image</string>
+    <string name="now_playing_podcast_cover">Now Playing Podcast Cover</string>
+    <string name="subscribe_button">Subscribe Button</string>
 </resources>

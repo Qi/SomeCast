@@ -1,6 +1,10 @@
 package com.qi.somecastapp;
 
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -11,14 +15,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qi.somecastapp.model.Episode;
-import com.qi.somecastapp.utilities.FetchSubscriptionTask;
+import com.qi.somecastapp.database.SubscribedContract;
+import com.qi.somecastapp.model.Podcast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
  */
-public class SubscriptionFragment extends Fragment{
+public class SubscriptionFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<Object>>{
 
     public static final int EPISODE_SCREEN = 0;
     public static final int PODCAST_SCREEN = 1;
@@ -29,6 +38,7 @@ public class SubscriptionFragment extends Fragment{
     private int mColumnCount = 3;
     RecyclerView subscriptionRv;
     private PodcastClickListener mListener;
+    private PodcastListAdapter adapter;
 
 
     /**
@@ -64,13 +74,12 @@ public class SubscriptionFragment extends Fragment{
         subscriptionRv = rootView.findViewById(R.id.rv_subscription);
         subscriptionRv.setHasFixedSize(true);
         LinearLayoutManager layoutManager;
-        RecyclerView.Adapter adapter;
         layoutManager = new GridLayoutManager(getContext(), 4);
         adapter = new PodcastListAdapter(mListener);
-        new FetchSubscriptionTask(adapter, getContext()).execute(PODCAST_SCREEN);
         subscriptionRv.setLayoutManager(layoutManager);
         subscriptionRv.setAdapter(adapter);
         ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        getActivity().getLoaderManager().initLoader(0, null, this).forceLoad();
         return rootView;
     }
 
@@ -90,5 +99,59 @@ public class SubscriptionFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public Loader<ArrayList<Object>> onCreateLoader(int id, Bundle args) {
+        return new FetchSubscriptionTask(getContext());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<Object>> loader, ArrayList<Object> data) {
+        ArrayList<Podcast> realPodcasts = new ArrayList<>();
+        for (Object p : data) {
+            ((Podcast)p).setSubscribed(true);
+            realPodcasts.add((Podcast) p);
+        }
+        adapter.setData(realPodcasts);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<Object>> loader) {
+
+    }
+
+    private static class FetchSubscriptionTask extends AsyncTaskLoader<ArrayList<Object>> {
+
+
+        public FetchSubscriptionTask(Context context) {
+            super(context);
+        }
+
+        @Override
+        public ArrayList<Object> loadInBackground() {
+                ArrayList<Object> podcasts = new ArrayList<>();
+                Cursor cursor = getContext().getContentResolver().query(SubscribedContract.SubscribedEntry.CONTENT_URI, null, null, null, null);
+                if (cursor != null) {
+                    int indexForJson = cursor.getColumnIndex(SubscribedContract.SubscribedEntry.COLUMN_PODCAST_META);
+                    while (cursor.moveToNext()) {
+                        try {
+                            JSONObject json = new JSONObject(cursor.getString(indexForJson));
+                            Podcast temp = new Podcast(json);
+                            podcasts.add(temp);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    cursor.close();
+                }
+                return podcasts;
+
+        }
+
+        @Override
+        public void deliverResult(ArrayList<Object> data) {
+            super.deliverResult(data);
+        }
     }
 }
